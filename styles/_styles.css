@@ -373,7 +373,7 @@ div.tag-select__loading-indicator {
 }
 
 .btn-apply.done {
-  @apply bg-green-800 dark:bg-green-300 dark:text-green-950;
+  @apply bg-green-900 dark:bg-green-200 dark:text-green-950;
 }
 
 .label {
