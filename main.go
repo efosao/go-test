@@ -57,20 +57,12 @@ func main() {
 	})
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		// Render index within layouts/main
 		return c.Render("index", fiber.Map{
 			"Title": "Hello, World!",
 		}, "layouts/main")
 	})
 
 	app.Get("/posts", func(c *fiber.Ctx) error {
-		// readPost := &Post{}
-		// db.First(&readPost, "id = ?", "cll03wjh700hvo485rzqiyjy2")
-		// // Render index within layouts/main
-		// return c.Render("index", fiber.Map{
-		// 	"Title": readPost.Title,
-		// }, "layouts/main")
-
 		posts := &[]models.Post{}
 		db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Limit(8).Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Find(&posts)
 
@@ -91,7 +83,6 @@ func main() {
 		})
 	})
 
-	// get port from env
 	PORT := "localhost:8000"
 	if os.Getenv("PORT") != "" {
 		PORT = fmt.Sprintf(":%s", os.Getenv("PORT"))
