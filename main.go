@@ -30,7 +30,7 @@ func main() {
 		CacheStorage:         config.CacheStorageMemory,
 		InvalidateWhenUpdate: true,  // when u create/update/delete objects, invalidate cache
 		CacheTTL:             10000, // 5000 ms
-		CacheMaxItemCnt:      5,     // if length of objects retrieved one single time
+		CacheMaxItemCnt:      500,   // if length of objects retrieved one single time
 		// exceeds this number, then don't cache
 	})
 	db.Use(cache)
@@ -42,13 +42,12 @@ func main() {
 
 	sqlDB.SetMaxIdleConns(20)
 	sqlDB.SetMaxOpenConns(30)
-
 	engine := mustache.New("./views", ".mustache")
+
 	app := fiber.New(fiber.Config{
 		Views: engine,
 	})
 
-	app.Get("/monitor", monitor.New())
 	app.Use(compress.New())
 
 	app.Static("/public", "./public", fiber.Static{
@@ -64,6 +63,8 @@ func main() {
 			"Description": "Find the latest job posts in the tech industry.",
 		}, "layouts/main")
 	})
+
+	app.Get("/monitor", monitor.New())
 
 	app.Get("/posts", func(c *fiber.Ctx) error {
 		posts := &[]models.Post{}
