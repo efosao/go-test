@@ -1,0 +1,35 @@
+{
+  "name": "go-fiber",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "dev:css": "tailwindcss -i ./styles/_styles.css -o ./public/dist/stylesheet.css -c ./tailwind.config.ts --watch",
+    "predev": "bun run build:scripts",
+    "dev": "concurrently 'npm:dev:*'",
+    "build:scripts": "bun build --minify ./client-js/index.ts --outdir ./public/dist",
+    "build:scripts:prod": "bun build --minify ./client-js/index.ts --outdir ./public/dist",
+    "build:css:prod": "bun tailwindcss -i ./styles/_styles.css -o ./public/dist/stylesheet.css -m",
+    "build": "bun run build:scripts && bun run build:css:prod",
+    "lint": "bun prettier . --check",
+    "lint:fix": "bun prettier . --write"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/js-cookie": "^3.0.6"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@tailwindcss/forms": "^0.5.7",
+    "@tailwindcss/line-clamp": "^0.4.4",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.17",
+    "concurrently": "^8.2.2",
+    "htmx.org": "^1.9.10",
+    "js-cookie": "^3.0.5",
+    "postcss-import": "^16.0.0",
+    "prettier": "^3.2.4",
+    "prettier-plugin-tailwindcss": "^0.5.11"
+  }
+}
