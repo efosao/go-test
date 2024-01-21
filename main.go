@@ -11,6 +11,7 @@ import (
 	"github.com/Pacific73/gorm-cache/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/template/mustache/v2"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -47,6 +48,7 @@ func main() {
 		Views: engine,
 	})
 
+	app.Get("/monitor", monitor.New())
 	app.Use(compress.New())
 
 	app.Static("/public", "./public", fiber.Static{
