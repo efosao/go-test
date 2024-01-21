@@ -58,7 +58,8 @@ func main() {
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("index", fiber.Map{
-			"Title": "Hello, World!",
+			"Title":       "Hello, World!",
+			"Description": "Find the latest job posts in the tech industry.",
 		}, "layouts/main")
 	})
 
@@ -67,8 +68,9 @@ func main() {
 		db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Limit(8).Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Find(&posts)
 
 		return c.Render("posts", fiber.Map{
-			"Title": "Job Posts",
-			"Posts": posts,
+			"Title":       "Job Posts",
+			"Posts":       posts,
+			"Description": "Find the latest job posts in the tech industry.",
 		}, "layouts/main")
 	})
 
