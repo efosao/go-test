@@ -3,20 +3,21 @@ module gofiber
 go 1.21.6
 
 require (
-	github.com/go-gorm/caches/v3 v3.0.0
+	github.com/Pacific73/gorm-cache v1.1.1
+	github.com/go-mods/initials v0.0.0-20230701135643-af0016df88f8
 	github.com/gofiber/fiber/v2 v2.52.0
 	github.com/gofiber/template/mustache/v2 v2.0.8
+	github.com/gomarkdown/markdown v0.0.0-20231222211730-1d6d20845b47
+	github.com/lib/pq v1.10.9
 	gorm.io/driver/postgres v1.5.4
 	gorm.io/gorm v1.25.5
 )
 
 require (
-	github.com/Pacific73/gorm-cache v1.1.1 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/cbroglie/mustache v1.4.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/go-redis/redis v6.15.9+incompatible // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/gofiber/template v1.8.2 // indirect
 	github.com/gofiber/utils v1.1.0 // indirect
