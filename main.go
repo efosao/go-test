@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fmt"
 	"gofiber/models"
 	"log"
+	"os"
 	"time"
 
 	"github.com/Pacific73/gorm-cache/cache"
@@ -89,5 +91,11 @@ func main() {
 		})
 	})
 
-	log.Fatal(app.Listen("localhost:8000"))
+	// get port from env
+	PORT := "localhost:8000"
+	if os.Getenv("PORT") != "" {
+		PORT = fmt.Sprintf(":%s", os.Getenv("PORT"))
+	}
+
+	log.Fatal(app.Listen(PORT))
 }
