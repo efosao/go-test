@@ -1,26 +1,109 @@
-{{> views/partials/header }}
-<h1 class="text-3xl font-bolder">{{Title}}</h1>
 
 {{#Posts}}
-  <article class="overflow-hidden rounded-lg shadow transition hover:shadow-lg">
-  <img
-    alt="Office"
-    src="https://images.unsplash.com/photo-1524758631624-e2822e304c36?ixlib=rb-1.2.1&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
-    class="h-56 w-full object-cover"
-  />
+  <div
+      class="search_row group relative mb-4 rounded-md border-0 border-orange-200  bg-orange-200 text-black dark:border-slate-700 dark:bg-slate-700 dark:text-white"
+      onclick="utils.toggleOpenState('cbx{{ID}}', 'desc{{ID}}')"
+    >
+      {{! <img
+        alt="pin"
+        src={PATH_TO_PIN_CIRCLE}
+        class="absolute right-[-8px] top-[-8px] h-6 w-6 text-red-400"
+      /> }}
+      <div class="cursor-pointer">
+        <div class="flex h-32 items-center space-x-2 px-4">
+          <span
+            class="bg-teal-300 rounded-full initials inline-flex h-[80px] w-[80px] shrink-0 items-center justify-center overflow-hidden"
+          >
+              {{#Thumbnail}}
+              <span class="flex shadow-sm">
+                <img
+                  alt="{{CompanyName}} logo"
+                  class="overflow-hidden"
+                  loading="lazy"
+                  src="{{Thumbnail}}"
+                  width="60"
+                  height="60"
+                />
+              </span>
+              {{/Thumbnail}}
+              {{^Thumbnail}}
+              <span>
+                {{GetInitials}}
+              </span>
+              {{/Thumbnail}}
+          </span>
+          <div class="flex grow flex-col">
+            <p class="text-black line-clamp-1 font-semibold lg:line-clamp-2">
+              {{CompanyName}}
+            </p>
 
-  <div class="bg-white p-4 sm:p-6">
-    <time datetime="{{CreatedAt}}" class="block text-xs text-gray-500">{{CreatedAt}}</time>
+            <p class="text-black line-clamp-1 font-bold md:line-clamp-2">{{Title}}</p>
+            <p class="text-black">{{Location}}</p>
 
-    <a href="#">
-      <h3 class="mt-0.5 text-lg text-gray-900">{{Title}}</h3>
-    </a>
+            {{! <p>
+              {isRemote ? (
+                <>
+                  Remote&nbsp;
+                  {post.location && (
+                    <span class="text-orange-700 dark:text-orange-300">
+                      ({post.location.trim()})
+                    </span>
+                  )}
+                </>
+              ) : (
+                <>{post.location}</>
+              )}
+            </p> }}
+          </div>
+          <div class="tag-container">
+          {{#Tags}}
+          <button
+            class="inline cursor-pointer rounded-md bg-white px-2 font-semibold text-pink-950 transition-colors duration-300 hover:bg-blue-100 hover:text-black my-[2px]"
+            type="button"
+            onclick="utils.halt(event)"
+          >
+          {{.}}
+          </button>
+          {{/Tags}}
+          </div>
+          <span class="m-2">{{TimeSinceCreated}}</span>
+          {{! {alreadyApplied ? (
+            <span class="btn-apply done">Applied</span>
+          ) : (
+            <a
+              class="btn-apply"
+              href={applyUrl}
+              target={isExternalApplyLink ? "_blank" : undefined}
+              onclick="utils.halt(event)"
+            >
+              <span>Apply</span>
+            </a>
+          )} }}
+        </div>
+      </div>
 
-    <p class="mt-2 line-clamp-3 text-sm/relaxed text-gray-500">
-      {{Description}}
-    </p>
-  </div>
-</article>
+      <div onclick="utils.halt(event)" class="flex flex-col items-center justify-center">
+        <input
+          aria-label="toggle show description"
+          class="peer hidden"
+          type="checkbox"
+          id="cbx{{ID}}"
+        />
+        <div
+          class="hidden items-center justify-center peer-checked:flex"
+          hx-get="/partials/posts/details/{{ID}}"
+          hx-indicator="#htmx{{ID}}"
+          hx-swap="outerHTML transition:true"
+          hx-trigger="change"
+          id="desc{{ID}}"
+        >
+          <img
+            alt="loading"
+            id="htmx{{ID}}"
+            class="htmx-indicator m-4 h-8"
+            src="/public/images/pacman-loader.svg"
+          />
+        </div>
+      </div>
+    </div>
 {{/Posts}}
-
-{{> views/partials/footer }}
