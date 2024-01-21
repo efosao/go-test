@@ -11,28 +11,28 @@
       /> }}
       <div class="cursor-pointer">
         <div class="flex h-32 items-center space-x-2 px-4">
-          <span
-            class="bg-teal-300 rounded-full initials inline-flex h-[80px] w-[80px] shrink-0 items-center justify-center overflow-hidden"
-          >
-              {{#Thumbnail}}
-              <span class="flex shadow-sm">
-                <img
-                  alt="{{CompanyName}} logo"
-                  class="overflow-hidden"
-                  loading="lazy"
-                  src="{{Thumbnail}}"
-                  width="60"
-                  height="60"
-                />
-              </span>
-              {{/Thumbnail}}
-              {{^Thumbnail}}
-              <span>
-                {{GetInitials}}
-              </span>
-              {{/Thumbnail}}
-          </span>
-          <div class="flex grow flex-col">
+            {{#Thumbnail}}
+            <span
+              class="rounded-full initials inline-flex h-[40px] w-[40px] m-4 shrink-0 items-center justify-center overflow-hidden"
+            >
+              <img
+                alt="{{CompanyName}} logo"
+                class="overflow-hidden"
+                loading="lazy"
+                src="{{Thumbnail}}"
+                width="40"
+                height="40"
+              />
+            </span>
+            {{/Thumbnail}}
+            {{^Thumbnail}}
+            <span
+              class="bg-teal-300 rounded-full initials inline-flex h-[40px] w-[40px] m-4 shrink-0 items-center justify-center overflow-hidden"
+            >
+              {{GetInitials}}
+            </span>
+            {{/Thumbnail}}
+            <div class="flex grow flex-col">
             <p class="text-black line-clamp-1 font-semibold lg:line-clamp-2">
               {{CompanyName}}
             </p>
@@ -67,8 +67,8 @@
           {{/Tags}}
           </div>
           <span class="m-2">{{TimeSinceCreated}}</span>
+          <span class="btn-apply done">Applied</span>
           {{! {alreadyApplied ? (
-            <span class="btn-apply done">Applied</span>
           ) : (
             <a
               class="btn-apply"

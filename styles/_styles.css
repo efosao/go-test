@@ -286,7 +286,7 @@ div.tag-select__loading-indicator {
 }
 
 .tag-container {
-  @apply hidden max-h-[5.5rem] max-w-72 overflow-hidden text-right md:block;
+  @apply hidden max-h-[5.3rem] max-w-72 overflow-hidden text-right md:block;
 }
 
 .row-tag {
