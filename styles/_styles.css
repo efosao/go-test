@@ -369,11 +369,11 @@ div.tag-select__loading-indicator {
 }
 
 .btn-apply {
-  @apply rounded-md bg-green-700 px-4 py-1 font-semibold text-white transition-all hover:bg-opacity-70;
+  @apply rounded-md bg-slate-900 px-4 py-1 font-semibold text-white dark:bg-slate-400 dark:text-slate-950 transition-all hover:bg-opacity-70;
 }
 
 .btn-apply.done {
-  @apply bg-green-600;
+  @apply bg-green-800 dark:bg-green-300 dark:text-green-950;
 }
 
 .label {
