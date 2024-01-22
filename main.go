@@ -11,8 +11,10 @@ import (
 	"github.com/Pacific73/gorm-cache/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
+	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
+	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/mustache/v2"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -47,11 +49,12 @@ func main() {
 
 	app := fiber.New(fiber.Config{
 		Views: engine,
-		ETag:  true,
 	})
 
 	app.Use(compress.New())
 	app.Use(helmet.New())
+	app.Use(etag.New())
+	app.Use(recover.New())
 
 	app.Static("/public", "./public", fiber.Static{
 		Compress:      true,
