@@ -1,14 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"gofiber/models"
+
+	"fmt"
 	"log"
 	"os"
 	"time"
 
-	"github.com/Pacific73/gorm-cache/cache"
-	"github.com/Pacific73/gorm-cache/config"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/etag"
@@ -16,9 +15,13 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/mustache/v2"
+
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
+
+	"github.com/Pacific73/gorm-cache/cache"
+	"github.com/Pacific73/gorm-cache/config"
 )
 
 func main() {
