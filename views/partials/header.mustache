@@ -1,5 +1,27 @@
-<nav class="m-2 text-xl">
-  <a class="p-2 inline-block" href="/">Home</a>
-  <a class="p-2 inline-block" href="/posts">Job Posts</a>
-  <a class="p-2 inline-block" href="/monitor" target="_blank">Fiber Monitor</a>
+<nav class="m-2 text-xl flex justify-between">
+  <div>
+    <a class="p-2 inline-block" href="/">Home</a>
+    <a class="p-2 inline-block" href="/posts">Job Posts</a>
+    <a class="p-2 inline-block" href="/monitor" target="_blank">Fiber Monitor</a>
+  </div>
+
+  <form class="select-none" onchange="utils.setTheme(event)">
+      <label>
+        <span class="text-slate-800">theme</span>
+        <select class="ml-2 bg-transparent">
+          <option selected={"light" === currentTheme} value="light">
+            🌞
+          </option>
+          <option selected={"dark" === currentTheme} value="dark">
+            🌘
+          </option>
+          <option
+            selected={"system" === currentTheme || !currentTheme}
+            value="system"
+          >
+            🌎
+          </option>
+        </select>
+      </label>
+    </form>
 </nav>
