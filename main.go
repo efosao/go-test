@@ -55,7 +55,22 @@ func main() {
 	})
 
 	app.Use(compress.New())
-	app.Use(helmet.New())
+	app.Use(helmet.New(
+		helmet.Config{
+			ContentSecurityPolicy: `
+				default-src 'self';
+				base-uri 'self';
+				font-src 'self' https: data:;
+				form-action 'self';
+				frame-ancestors 'self';
+				img-src 'self' https: data:;
+				object-src 'none';
+				script-src 'self' unpkg.com 'unsafe-eval';
+				script-src-attr 'unsafe-inline';
+				style-src 'self' https: 'unsafe-inline';
+				upgrade-insecure-requests
+			`,
+		}))
 	app.Use(etag.New())
 	app.Use(recover.New())
 
