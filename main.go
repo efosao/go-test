@@ -94,10 +94,17 @@ func main() {
 	app.Get("/monitor", monitor.New())
 
 	app.Get("/posts", func(c *fiber.Ctx) error {
+		cookie := new(models.Cookie)
 		posts := &[]models.Post{}
+
 		db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Limit(10).Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Find(&posts)
 
+		if err := c.CookieParser(cookie); err != nil {
+			return err
+		}
+
 		return c.Render("posts", fiber.Map{
+			"Theme":       cookie.Theme,
 			"Title":       "Job Posts",
 			"Posts":       posts,
 			"Description": "Find the latest job posts in the tech industry.",
