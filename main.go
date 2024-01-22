@@ -65,7 +65,7 @@ func main() {
 				frame-ancestors 'self';
 				img-src 'self' https: data:;
 				object-src 'none';
-				script-src 'self' unpkg.com cdn.jsdelivr.net 'unsafe-eval';
+				script-src 'self' unpkg.com cdn.jsdelivr.net 'unsafe-eval' 'unsafe-inline';
 				script-src-attr 'unsafe-inline';
 				style-src 'self' https: 'unsafe-inline';
 				upgrade-insecure-requests
