@@ -27,6 +27,15 @@ func (p Post) GetInitials() string {
 	return initials.GetInitials(p.CompanyName)
 }
 
+func (p Post) IsPinned() bool {
+	for _, tag := range p.Tags {
+		if tag == "remote" {
+			return true
+		}
+	}
+	return false
+}
+
 func (p Post) TimeSinceCreated() string {
 	timespan := time.Since(p.PublishedAt).Hours()
 	switch {
