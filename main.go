@@ -76,9 +76,12 @@ func main() {
 
 	app.Static("/public", "./public", fiber.Static{
 		Compress:      true,
-		CacheDuration: 10 * time.Second,
-		MaxAge:        3600,
+		CacheDuration: 60 * time.Second,
 		ByteRange:     true,
+		ModifyResponse: func(ctx *fiber.Ctx) error {
+			ctx.Set(fiber.HeaderCacheControl, fmt.Sprintf("private, max-age=%d, stale-while-revalidate=3600", 3600))
+			return nil
+		},
 	})
 
 	app.Get("/", func(c *fiber.Ctx) error {
