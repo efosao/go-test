@@ -11,15 +11,13 @@
   <link rel="stylesheet" href="/public/dist/stylesheet.css"></link>
 </head>
 
-<body hx-boost="true" class="dark:bg-slate-400">
-  <div class="max-w-4xl mx-auto">
-  {{> views/partials/header }}
-    <main class="p-4">
-      <h1 class="text-3xl font-extrabold mb-4 text-black dark:text-black">{{Title}}</h1>
-      {{{embed}}}
-    </main>
-  {{> views/partials/footer }}
-  </div>
+<body hx-boost="true" class="max-w-4xl mx-auto dark:bg-slate-400">
+{{> views/partials/header }}
+  <main class="p-4">
+    <h1 class="text-3xl font-extrabold mb-4 text-black dark:text-black">{{Title}}</h1>
+    {{{embed}}}
+  </main>
+{{> views/partials/footer }}
 </body>
 
 </html>
