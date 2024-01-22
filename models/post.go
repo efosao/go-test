@@ -1,9 +1,8 @@
 package models
 
 import (
-	"time"
-
 	"fmt"
+	"time"
 
 	"github.com/go-mods/initials"
 	"github.com/gomarkdown/markdown"
@@ -13,16 +12,15 @@ import (
 )
 
 type Post struct {
-	ID              string `gorm:"primaryKey;default:cuid()"`
-	CompanyName     string
-	CompanyInitials string `gorm:"-"`
-	Location        string
-	Tags            pq.StringArray `gorm:"type:text[]"`
-	Thumbnail       string
-	Title           string
-	Description     string
-	PublishedAt     time.Time
-	CreatedAt       time.Time
+	ID          string `gorm:"primaryKey;default:cuid()"`
+	CompanyName string
+	Location    string
+	Tags        pq.StringArray `gorm:"type:text[]"`
+	Thumbnail   string
+	Title       string
+	Description string
+	PublishedAt time.Time
+	CreatedAt   time.Time
 }
 
 func (p Post) GetInitials() string {
