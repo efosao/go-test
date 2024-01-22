@@ -304,7 +304,7 @@ div.tag-select__loading-indicator {
 .search_row {
   transition: all 0.3s ease-in-out;
   article {
-    @apply prose prose-lg m-4 p-4 dark:bg-black rounded-lg dark:text-gray-200;
+    @apply prose prose-lg p-4 rounded-b-lg dark:bg-black dark:text-gray-200 md:mb-8 md:rounded-lg;
     h1 {
       @apply dark:text-gray-200;
     }
