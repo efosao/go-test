@@ -2,6 +2,8 @@
 /// <reference lib="dom.iterable" />
 import htmx from "htmx.org";
 import Cookies from "js-cookie";
+import SlimSelect from "../node_modules/slim-select/src/slim-select/index";
+import Alpine from "alpinejs";
 
 declare global {
   interface Window {
@@ -12,8 +14,7 @@ declare global {
 
 window.__htmx = htmx;
 
-// const ENABLE_HTMX_DEBUG = process.env.NODE_ENV !== "production";
-const ENABLE_HTMX_DEBUG = false;
+const ENABLE_HTMX_DEBUG = process.env.NODE_ENV !== "production" && false;
 
 const utils = {
   halt: (e: Event) => {
@@ -50,12 +51,32 @@ const utils = {
 
   setTheme: (event: { target: { value: "light" | "dark" | "system" } }) => {
     const theme = event?.target?.value;
-    const html: HTMLElement = document.getElementsByTagName("html")[0];
     const options = ["light", "dark", "system"];
 
     if (!options.includes(theme)) throw new Error("Unknown theme: " + theme);
     Cookies.set("theme", theme);
     utils.configureDefaultTheme();
+  },
+
+  loadSlimSelect: () => {
+    setTimeout(() => {
+      for (const select of document.getElementsByClassName("slim-select")) {
+        /* @ts-ignore */
+        if (typeof select.slim !== "undefined") {
+          /* @ts-ignore */
+          select.slim.destroy();
+        }
+        select.classList.remove("hide");
+        new SlimSelect({
+          select: select as HTMLSelectElement,
+          settings: {
+            isMultiple: true,
+            maxSelected: 5,
+            searchHighlight: true
+          }
+        });
+      }
+    }, 50);
   }
 };
 
@@ -67,7 +88,10 @@ window
 
 window.utils = utils;
 
-window.document.addEventListener("DOMContentLoaded", utils.init);
+window.document.addEventListener("DOMContentLoaded", () => {
+  Alpine.start();
+  utils.init();
+});
 
 if (htmx && ENABLE_HTMX_DEBUG) {
   window.__htmx.logger = function (
@@ -76,7 +100,7 @@ if (htmx && ENABLE_HTMX_DEBUG) {
     data: Record<string, any>
   ) {
     if (console) {
-      console.log(event, elt, data);
+      console.debug(event, elt, data);
     }
   };
 }

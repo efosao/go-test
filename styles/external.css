@@ -1,0 +1,9 @@
+.ss-main  {
+    @apply min-h-8;
+    & .ss-values .ss-value .ss-value-text {
+        @apply text-lg;
+    }
+    & .ss-values {
+        @apply min-h-8;
+    }
+}
