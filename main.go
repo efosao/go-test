@@ -37,8 +37,9 @@ func main() {
 		CacheStorage:         config.CacheStorageMemory,
 		InvalidateWhenUpdate: true,  // when u create/update/delete objects, invalidate cache
 		CacheTTL:             10000, // 5000 ms
-		CacheMaxItemCnt:      500,   // if length of objects retrieved one single time
-		// exceeds this number, then don't cache
+		// if length of objects retrieved one single time
+		// exceeds this number, don't cache
+		CacheMaxItemCnt: 20,
 	})
 	db.Use(cache)
 
@@ -75,6 +76,20 @@ func main() {
 	app.Use(etag.New())
 	app.Use(recover.New())
 
+	app.Use(func(c *fiber.Ctx) error {
+		theme := c.Cookies("theme")
+		themeOptions := []models.ThemeOption{}
+		themeOptions = append(themeOptions, models.ThemeOption{Value: "light", Label: "🌞", Selected: theme == "light"})
+		themeOptions = append(themeOptions, models.ThemeOption{Value: "dark", Label: "🌘", Selected: theme == "dark"})
+		themeOptions = append(themeOptions, models.ThemeOption{
+			Value:    "system",
+			Label:    "🌎",
+			Selected: (theme != "light" && theme != "dark"),
+		})
+		c.Locals("ThemeOptions", themeOptions)
+		return c.Next()
+	})
+
 	app.Static("/public", "./public", fiber.Static{
 		Compress:      true,
 		CacheDuration: 60 * time.Second,
@@ -87,8 +102,9 @@ func main() {
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("index", fiber.Map{
-			"Title":       "Hello, World!",
-			"Description": "Find the latest job posts in the tech industry.",
+			"Title":        "Hello, World!",
+			"Description":  "Find the latest job posts in the tech industry.",
+			"ThemeOptions": c.Locals("ThemeOptions"),
 		}, "layouts/main")
 	})
 
@@ -139,11 +155,12 @@ func main() {
 		}
 
 		return c.Render("posts", fiber.Map{
-			"Theme":       cookie.Theme,
-			"Tags":        tags,
-			"Title":       "Job Posts",
-			"Posts":       posts,
-			"Description": "Find the latest job posts in the tech industry.",
+			"Theme":        cookie.Theme,
+			"Tags":         tags,
+			"Title":        "Job Posts",
+			"Posts":        posts,
+			"Description":  "Find the latest job posts in the tech industry.",
+			"ThemeOptions": c.Locals("ThemeOptions"),
 		}, "layouts/main")
 	})
 
