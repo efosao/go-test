@@ -2,6 +2,7 @@ package main
 
 import (
 	"gofiber/models"
+	"strings"
 
 	"fmt"
 	"log"
@@ -95,9 +96,43 @@ func main() {
 
 	app.Get("/posts", func(c *fiber.Ctx) error {
 		cookie := new(models.Cookie)
-		posts := &[]models.Post{}
+		postsChan := make(chan []models.Post)
+		tagsChan := make(chan []models.Tag)
 
-		db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Limit(10).Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Find(&posts)
+		go (func(p chan []models.Post) {
+			fmt.Println("Fetching posts...")
+			posts := []models.Post{}
+			db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Limit(10).Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Find(&posts)
+			fmt.Println("Done fetching posts...")
+			p <- posts
+		})(postsChan)
+
+		go (func(t chan []models.Tag) {
+			fmt.Println("Fetching tags...")
+			tags := []models.Tag{}
+			db.Raw(`
+				SELECT unnest(tags) AS name, count(*)::text AS count
+				FROM posts
+				WHERE published_at IS NOT NULL
+				GROUP by name
+				ORDER BY count(*) DESC;
+			`).Scan(&tags)
+			fmt.Println("Done fetching tags...")
+			t <- tags
+		})(tagsChan)
+
+		posts := <-postsChan
+		tags := <-tagsChan
+
+		if err := db.Raw(`
+			SELECT unnest(tags) AS name, count(*)::text AS count
+			FROM posts
+			WHERE published_at IS NOT NULL
+			GROUP by name
+			ORDER BY count(*) DESC;
+		`).Scan(&tags).Error; err != nil {
+			return err
+		}
 
 		if err := c.CookieParser(cookie); err != nil {
 			return err
@@ -105,6 +140,7 @@ func main() {
 
 		return c.Render("posts", fiber.Map{
 			"Theme":       cookie.Theme,
+			"Tags":        tags,
 			"Title":       "Job Posts",
 			"Posts":       posts,
 			"Description": "Find the latest job posts in the tech industry.",
@@ -119,6 +155,30 @@ func main() {
 			"Title":       post.Title,
 			"ID":          post.ID,
 			"Description": post.GetDescription(),
+		})
+	})
+
+	app.Post("/partials/posts/search", func(c *fiber.Ctx) error {
+		type Body struct{ Tags []string }
+		body := Body{}
+		c.BodyParser(&body)
+		posts := []models.Post{}
+		queryInputTags := "{" + strings.Join(body.Tags, ",") + "}"
+		commaSeparatedTags := strings.Join(body.Tags, ",")
+
+		if commaSeparatedTags == "" {
+			c.Response().Header.Set("HX-Push-Url", "/posts")
+		} else {
+			c.Response().Header.Set("HX-Push-Url", fmt.Sprintf("/posts?tags=%s", commaSeparatedTags))
+		}
+
+		db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Limit(10).Where("tags @> ?", queryInputTags).Find(&posts)
+
+		return c.Render("post_list", fiber.Map{
+			"Title":       "Job Posts",
+			"Description": "Find the latest job posts in the tech industry.",
+			"Tags":        body.Tags,
+			"Posts":       posts,
 		})
 	})
 

@@ -1,0 +1,114 @@
+{{#Posts}}
+<div
+  {{#IsPinned}}
+  class="search_row group relative mb-4 rounded-md border-0 border-pink-200 bg-pink-100 dark:border-prussian-blue-900 dark:bg-black dark:text-white"
+  {{/IsPinned}}
+  {{^IsPinned}}
+  class="search_row group relative mb-4 rounded-md border-0 border-orange-200  bg-orange-200 text-black dark:border-slate-700 dark:bg-slate-700 dark:text-white"
+  {{/IsPinned}}
+  onclick="utils.toggleOpenState('cbx{{ID}}', 'desc{{ID}}')"
+>
+  {{#IsPinned}}
+  <img
+    alt="pin"
+    src="/public/images/pin.svg"
+    class="absolute right-[-8px] top-[-8px] h-6 w-6 text-red-400"
+  />
+  {{/IsPinned}}
+  <div class="cursor-pointer flex h-32 items-center space-x-2 px-4">
+      {{#Thumbnail}}
+      <span
+        class="rounded-full initials inline-flex h-[40px] w-[40px] m-4 shrink-0 items-center justify-center overflow-hidden"
+      >
+        <img
+          alt="{{CompanyName}} logo"
+          class="overflow-hidden"
+          loading="lazy"
+          src="{{Thumbnail}}"
+          width="40"
+          height="40"
+        />
+      </span>
+      {{/Thumbnail}}
+      {{^Thumbnail}}
+      <span
+        class="bg-teal-300 rounded-full initials inline-flex h-[40px] w-[40px] m-4 shrink-0 items-center justify-center overflow-hidden"
+      >
+        {{GetInitials}}
+      </span>
+      {{/Thumbnail}}
+      <div class="flex grow flex-col">
+      <p class="text-black line-clamp-1 font-semibold lg:line-clamp-2">
+        {{CompanyName}}
+      </p>
+
+      <p class="text-black line-clamp-1 font-bold md:line-clamp-2 max-w-80">{{Title}}</p>
+      <p class="text-black">{{Location}}</p>
+
+      {{! <p>
+        {isRemote ? (
+          <>
+            Remote&nbsp;
+            {post.location && (
+              <span class="text-orange-700 dark:text-orange-300">
+                ({post.location.trim()})
+              </span>
+            )}
+          </>
+        ) : (
+          <>{post.location}</>
+        )}
+      </p> }}
+    </div>
+    <div class="tag-container">
+    {{#Tags}}
+    <button
+      class="inline cursor-pointer rounded-md bg-white px-2 font-semibold text-pink-950 transition-colors duration-300 hover:bg-blue-100 hover:text-black my-[2px]"
+      type="button"
+      onclick="utils.halt(event)"
+    >
+    {{.}}
+    </button>
+    {{/Tags}}
+    </div>
+    <span class="m-2">{{TimeSinceCreated}}</span>
+    <span class="btn-apply done">Applied</span>
+    {{! {alreadyApplied ? (
+    ) : (
+      <a
+        class="btn-apply"
+        href={applyUrl}
+        target={isExternalApplyLink ? "_blank" : undefined}
+        onclick="utils.halt(event)"
+      >
+        <span>Apply</span>
+      </a>
+    )} }}
+  </div>
+
+  <div onclick="utils.halt(event)" class="flex flex-col items-center justify-center">
+    <input
+      aria-label="toggle show description"
+      class="peer hidden"
+      type="checkbox"
+      id="cbx{{ID}}"
+    />
+    <div
+      class="hidden items-center justify-center peer-checked:flex"
+      hx-get="/partials/posts/details/{{ID}}"
+      hx-indicator="#htmx{{ID}}"
+      hx-swap="outerHTML transition:true"
+      hx-trigger="change"
+      id="desc{{ID}}"
+    >
+      <img
+        alt="loading"
+        id="htmx{{ID}}"
+        class="htmx-indicator mb-24 h-12"
+        src="/public/images/bars-loader.svg"
+        height="48"
+      />
+    </div>
+  </div>
+</div>
+{{/Posts}}
