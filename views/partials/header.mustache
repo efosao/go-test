@@ -6,16 +6,17 @@
   </div>
 
   <form class="select-none" onchange="utils.setTheme(event)">
-      <label>
-        <span class="text-slate-800">theme</span>
-        <select class="ml-2 bg-transparent">
-          <option selected={"light" === currentTheme} value="light">
+      <label class="flex items-center">
+        <span class="text-slate-900 dark:text-slate-900">theme</span>
+        <select class="ml-2 dark:bg-slate-600">
+          <option class="bg-transparent" selected={"light" === currentTheme} value="light">
             🌞
           </option>
-          <option selected={"dark" === currentTheme} value="dark">
+          <option class="bg-transparent" selected={"dark" === currentTheme} value="dark">
             🌘
           </option>
           <option
+            class="bg-transparent"
             selected={"system" === currentTheme || !currentTheme}
             value="system"
           >

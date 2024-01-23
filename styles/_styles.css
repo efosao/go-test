@@ -325,7 +325,7 @@ div.tag-select__loading-indicator {
     color: gray;
     border-bottom: 4px solid #fee;
     overflow-wrap: anywhere;
-    padding: 2px 4px;
+    padding: 2px 2px;
     transition: all 0.3s;
     &:hover {
       background: #fee;

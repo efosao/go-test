@@ -1,10 +1,10 @@
 {{#Posts}}
 <div
   {{#IsPinned}}
-  class="search_row group relative mb-4 rounded-md border-0 border-pink-200 bg-pink-100 dark:border-prussian-blue-900 dark:bg-black dark:text-white"
+  class="search_row group relative mb-2 rounded-md border-0 border-pink-200 bg-pink-100 dark:border-prussian-blue-900 dark:bg-black dark:text-white"
   {{/IsPinned}}
   {{^IsPinned}}
-  class="search_row group relative mb-4 rounded-md border-0 border-orange-200  bg-orange-200 text-black dark:border-slate-700 dark:bg-slate-700 dark:text-white"
+  class="search_row group relative mb-2 rounded-md border-0 border-orange-200  bg-orange-200 text-black dark:border-slate-700 dark:bg-slate-700 dark:text-white"
   {{/IsPinned}}
   onclick="utils.toggleOpenState('cbx{{ID}}', 'desc{{ID}}')"
 >
@@ -15,10 +15,10 @@
     class="absolute right-[-8px] top-[-8px] h-6 w-6 text-red-400"
   />
   {{/IsPinned}}
-  <div class="cursor-pointer flex h-32 items-center space-x-2 px-4">
+  <div class="cursor-pointer flex h-32 items-center space-x-2 px-2">
       {{#Thumbnail}}
       <span
-        class="rounded-full initials inline-flex h-[40px] w-[40px] m-4 shrink-0 items-center justify-center overflow-hidden"
+        class="rounded-full initials inline-flex h-[40px] w-[40px] my-2 shrink-0 items-center justify-center overflow-hidden"
       >
         <img
           alt="{{CompanyName}} logo"
@@ -32,7 +32,7 @@
       {{/Thumbnail}}
       {{^Thumbnail}}
       <span
-        class="bg-teal-300 rounded-full initials inline-flex h-[40px] w-[40px] m-4 shrink-0 items-center justify-center overflow-hidden"
+        class="bg-teal-300 rounded-full initials inline-flex h-[40px] w-[40px] my-2 shrink-0 items-center justify-center overflow-hidden"
       >
         {{GetInitials}}
       </span>
