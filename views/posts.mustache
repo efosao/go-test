@@ -3,8 +3,8 @@
     aria-hidden="true"
     class="hide slim-select"
     hx-post="/partials/posts/search"
-    hx-trigger="change"
     hx-target="#post-list"
+    hx-trigger="change"
     id="tags"
     name="tags"
     tabindex="-1"
@@ -12,10 +12,9 @@
     x-init="window.utils.loadSlimSelect"
   >
     {{#Tags}}
-      <option value="{{Name}}">{{Name}}</option>
+      <option value="{{Name}}" {{#Selected}}selected{{/Selected}}>{{Name}}</option>
     {{/Tags}} 
   </select>
-  {{! <script>utils.loadSlimSelect()</script> }}
 </div>
 
 

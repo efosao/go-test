@@ -77,16 +77,18 @@ func main() {
 	app.Use(recover.New())
 
 	app.Use(func(c *fiber.Ctx) error {
-		theme := c.Cookies("theme")
-		themeOptions := []models.ThemeOption{}
-		themeOptions = append(themeOptions, models.ThemeOption{Value: "light", Label: "🌞", Selected: theme == "light"})
-		themeOptions = append(themeOptions, models.ThemeOption{Value: "dark", Label: "🌘", Selected: theme == "dark"})
-		themeOptions = append(themeOptions, models.ThemeOption{
-			Value:    "system",
-			Label:    "🌎",
-			Selected: (theme != "light" && theme != "dark"),
-		})
-		c.Locals("ThemeOptions", themeOptions)
+		if isGet := (c.Method() == "GET"); isGet {
+			theme := c.Cookies("theme")
+			themeOptions := []models.ThemeOption{}
+			themeOptions = append(themeOptions, models.ThemeOption{Value: "light", Label: "🌞", Selected: theme == "light"})
+			themeOptions = append(themeOptions, models.ThemeOption{Value: "dark", Label: "🌘", Selected: theme == "dark"})
+			themeOptions = append(themeOptions, models.ThemeOption{
+				Value:    "system",
+				Label:    "🌎",
+				Selected: (theme != "light" && theme != "dark"),
+			})
+			c.Locals("ThemeOptions", themeOptions)
+		}
 		return c.Next()
 	})
 
@@ -114,17 +116,22 @@ func main() {
 		cookie := new(models.Cookie)
 		postsChan := make(chan []models.Post)
 		tagsChan := make(chan []models.Tag)
+		tagString := strings.Split(c.Query("tags"), ",")
 
 		go (func(p chan []models.Post) {
-			fmt.Println("Fetching posts...")
 			posts := []models.Post{}
-			db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Limit(10).Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Find(&posts)
-			fmt.Println("Done fetching posts...")
-			p <- posts
+			if len(tagString) > 0 {
+				queryInputTags := "{" + strings.Join(tagString, ",") + "}"
+				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Limit(10).Where("tags @> ?", queryInputTags).Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Find(&posts)
+				p <- posts
+				return
+			} else {
+				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Limit(10).Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Find(&posts)
+				p <- posts
+			}
 		})(postsChan)
 
 		go (func(t chan []models.Tag) {
-			fmt.Println("Fetching tags...")
 			tags := []models.Tag{}
 			db.Raw(`
 				SELECT unnest(tags) AS name, count(*)::text AS count
@@ -133,21 +140,23 @@ func main() {
 				GROUP by name
 				ORDER BY count(*) DESC;
 			`).Scan(&tags)
-			fmt.Println("Done fetching tags...")
 			t <- tags
 		})(tagsChan)
 
 		posts := <-postsChan
 		tags := <-tagsChan
 
-		if err := db.Raw(`
-			SELECT unnest(tags) AS name, count(*)::text AS count
-			FROM posts
-			WHERE published_at IS NOT NULL
-			GROUP by name
-			ORDER BY count(*) DESC;
-		`).Scan(&tags).Error; err != nil {
-			return err
+		selectedTagMap := map[string]bool{}
+		for _, selectedTag := range tagString {
+			selectedTagMap[selectedTag] = true
+		}
+
+		updatedTags := []models.Tag{}
+		for _, tag := range tags {
+			if selectedTagMap[tag.Name] {
+				tag.Selected = true
+			}
+			updatedTags = append(updatedTags, tag)
 		}
 
 		if err := c.CookieParser(cookie); err != nil {
@@ -156,7 +165,7 @@ func main() {
 
 		return c.Render("posts", fiber.Map{
 			"Theme":        cookie.Theme,
-			"Tags":         tags,
+			"Tags":         updatedTags,
 			"Title":        "Job Posts",
 			"Posts":        posts,
 			"Description":  "Find the latest job posts in the tech industry.",
