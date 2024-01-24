@@ -87,12 +87,14 @@
   </div>
 
   <div onclick="utils.halt(event)" class="flex flex-col items-center justify-center">
+    <form>
     <input
       aria-label="toggle show description"
       class="peer hidden"
       type="checkbox"
       id="cbx{{ID}}"
     />
+    </hidden>
     <div
       class="hidden items-center justify-center peer-checked:flex"
       hx-get="/partials/posts/details/{{ID}}"
@@ -112,3 +114,22 @@
   </div>
 </div>
 {{/Posts}}
+
+<div
+  hx-post="/partials/posts/search/{{Page}}"
+  hx-swap="outerHTML"
+  hx-trigger="revealed"
+  id="nextPageLoaderId_{{Page}}"
+>
+  <form
+    <div class="my-8 flex items-center justify-center">
+      <img
+        alt="loading"
+        class="htmx-indicator h-14"
+        src="/public/images/bars-loader.svg"
+      />
+    </div>
+  </form>
+</div>
+
+

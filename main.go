@@ -2,6 +2,7 @@ package main
 
 import (
 	"gofiber/models"
+	"strconv"
 	"strings"
 
 	"fmt"
@@ -122,11 +123,11 @@ func main() {
 			posts := []models.Post{}
 			if len(tagString) > 0 {
 				queryInputTags := "{" + strings.Join(tagString, ",") + "}"
-				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Limit(10).Where("tags @> ?", queryInputTags).Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Find(&posts)
+				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Limit(10).Where("tags @> ?", queryInputTags).Find(&posts)
 				p <- posts
 				return
 			} else {
-				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Limit(10).Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Find(&posts)
+				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Limit(10).Find(&posts)
 				p <- posts
 			}
 		})(postsChan)
@@ -164,12 +165,13 @@ func main() {
 		}
 
 		return c.Render("posts", fiber.Map{
+			"Description":  "Find the latest job posts in the tech industry.",
+			"Page":         "1",
+			"Posts":        posts,
 			"Theme":        cookie.Theme,
 			"Tags":         updatedTags,
-			"Title":        "Job Posts",
-			"Posts":        posts,
-			"Description":  "Find the latest job posts in the tech industry.",
 			"ThemeOptions": c.Locals("ThemeOptions"),
+			"Title":        "Job Posts",
 		}, "layouts/main")
 	})
 
@@ -184,28 +186,42 @@ func main() {
 		})
 	})
 
-	app.Post("/partials/posts/search", func(c *fiber.Ctx) error {
+	app.Post("/partials/posts/search/:page", func(c *fiber.Ctx) error {
 		type Body struct{ Tags []string }
-		body := Body{}
-		c.BodyParser(&body)
-		posts := []models.Post{}
-		queryInputTags := "{" + strings.Join(body.Tags, ",") + "}"
-		commaSeparatedTags := strings.Join(body.Tags, ",")
-
-		if commaSeparatedTags == "" {
-			c.Response().Header.Set("HX-Push-Url", "/posts")
+		if pageStr, err := strconv.Atoi(c.Params("page", "0")); err != nil {
+			return err
 		} else {
-			c.Response().Header.Set("HX-Push-Url", fmt.Sprintf("/posts?tags=%s", commaSeparatedTags))
+			body := Body{}
+			c.BodyParser(&body)
+			page := int(pageStr)
+			nextPage := page + 1
+			offset := (nextPage - 1) * 10
+			posts := []models.Post{}
+			queryInputTags := "{" + strings.Join(body.Tags, ",") + "}"
+			commaSeparatedTags := strings.Join(body.Tags, ",")
+
+			if commaSeparatedTags == "" {
+				if page == 0 {
+					c.Response().Header.Set("HX-Push-Url", "/posts")
+				}
+				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
+
+				return c.Render("post_list", fiber.Map{
+					"Posts": posts,
+					"Page":  nextPage,
+				})
+			} else {
+				if page == 0 {
+					c.Response().Header.Set("HX-Push-Url", fmt.Sprintf("/posts?tags=%s", commaSeparatedTags))
+				}
+				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Offset(offset).Limit(10).Where("tags @> ?", queryInputTags).Find(&posts)
+
+				return c.Render("post_list", fiber.Map{
+					"Posts": posts,
+					"Page":  nextPage,
+				})
+			}
 		}
-
-		db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Limit(10).Where("tags @> ?", queryInputTags).Find(&posts)
-
-		return c.Render("post_list", fiber.Map{
-			"Title":       "Job Posts",
-			"Description": "Find the latest job posts in the tech industry.",
-			"Tags":        body.Tags,
-			"Posts":       posts,
-		})
 	})
 
 	PORT := "localhost:8000"
