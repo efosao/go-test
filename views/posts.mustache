@@ -12,7 +12,7 @@
     x-init="window.utils.loadSlimSelect"
   >
     {{#Tags}}
-      <option value="{{Name}}" {{#Selected}}selected{{/Selected}}>{{Name}}</option>
+      <option value="{{GetEscapedName}}" {{#Selected}}selected{{/Selected}}>{{Name}}</option>
     {{/Tags}} 
   </select>
 </div>

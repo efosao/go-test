@@ -7,6 +7,7 @@ import (
 
 	"fmt"
 	"log"
+	"net/url"
 	"os"
 	"time"
 
@@ -119,11 +120,22 @@ func main() {
 		tagsChan := make(chan []models.Tag)
 		selectedTagsStr := c.Query("tags")
 		selectedTags := strings.Split(selectedTagsStr, ",")
+		unescapedSelectedTags := []string{}
+		for _, selectedTag := range selectedTags {
+			escapedTag, err := url.QueryUnescape(selectedTag)
+			if err == nil {
+				// This is a hack to fix the fact that the "c++" tag is not being unescaped properly
+				if escapedTag == "c  " {
+					escapedTag = strings.ReplaceAll(escapedTag, " ", "+")
+				}
+				unescapedSelectedTags = append(unescapedSelectedTags, escapedTag)
+			}
+		}
 
 		go (func(p chan []models.Post) {
 			posts := []models.Post{}
 			if len(selectedTags) > 0 {
-				queryInputTags := "{" + strings.Join(selectedTags, ",") + "}"
+				queryInputTags := "{" + strings.Join(unescapedSelectedTags, ",") + "}"
 				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
 				p <- posts
 				return
@@ -205,8 +217,19 @@ func main() {
 			} else {
 				selectedTagsStr = c.Query("tags")
 			}
+			unescapedSelectedTags := []string{}
+			for _, selectedTag := range strings.Split(selectedTagsStr, ",") {
+				escapedTag, err := url.QueryUnescape(selectedTag)
+				if err == nil {
+					// This is a hack to fix the fact that the "c++" tag is not being unescaped properly
+					if escapedTag == "c  " {
+						escapedTag = strings.ReplaceAll(escapedTag, " ", "+")
+					}
+					unescapedSelectedTags = append(unescapedSelectedTags, escapedTag)
+				}
+			}
 
-			queryInputTags := "{" + selectedTagsStr + "}"
+			queryInputTags := "{" + strings.Join(unescapedSelectedTags, ",") + "}"
 
 			if selectedTagsStr == "" {
 				if page == 0 {
