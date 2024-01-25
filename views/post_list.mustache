@@ -116,7 +116,12 @@
 {{/Posts}}
 
 <div
+  {{#SelectedTagsStr}}
+  hx-post="/partials/posts/search/{{Page}}?tags={{SelectedTagsStr}}"
+  {{/SelectedTagsStr}}
+  {{^SelectedTagsStr}}
   hx-post="/partials/posts/search/{{Page}}"
+  {{/SelectedTagsStr}}
   hx-swap="outerHTML"
   hx-trigger="revealed"
   id="nextPageLoaderId_{{Page}}"

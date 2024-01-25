@@ -117,17 +117,18 @@ func main() {
 		cookie := new(models.Cookie)
 		postsChan := make(chan []models.Post)
 		tagsChan := make(chan []models.Tag)
-		tagString := strings.Split(c.Query("tags"), ",")
+		selectedTagsStr := c.Query("tags")
+		selectedTags := strings.Split(selectedTagsStr, ",")
 
 		go (func(p chan []models.Post) {
 			posts := []models.Post{}
-			if len(tagString) > 0 {
-				queryInputTags := "{" + strings.Join(tagString, ",") + "}"
-				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Limit(10).Where("tags @> ?", queryInputTags).Find(&posts)
+			if len(selectedTags) > 0 {
+				queryInputTags := "{" + strings.Join(selectedTags, ",") + "}"
+				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
 				p <- posts
 				return
 			} else {
-				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Limit(10).Find(&posts)
+				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
 				p <- posts
 			}
 		})(postsChan)
@@ -148,7 +149,7 @@ func main() {
 		tags := <-tagsChan
 
 		selectedTagMap := map[string]bool{}
-		for _, selectedTag := range tagString {
+		for _, selectedTag := range selectedTags {
 			selectedTagMap[selectedTag] = true
 		}
 
@@ -165,13 +166,14 @@ func main() {
 		}
 
 		return c.Render("posts", fiber.Map{
-			"Description":  "Find the latest job posts in the tech industry.",
-			"Page":         "1",
-			"Posts":        posts,
-			"Theme":        cookie.Theme,
-			"Tags":         updatedTags,
-			"ThemeOptions": c.Locals("ThemeOptions"),
-			"Title":        "Job Posts",
+			"Description":     "Find the latest job posts in the tech industry.",
+			"Page":            "1",
+			"Posts":           posts,
+			"SelectedTagsStr": selectedTagsStr,
+			"Theme":           cookie.Theme,
+			"Tags":            updatedTags,
+			"ThemeOptions":    c.Locals("ThemeOptions"),
+			"Title":           "Job Posts",
 		}, "layouts/main")
 	})
 
@@ -197,14 +199,24 @@ func main() {
 			nextPage := page + 1
 			offset := (nextPage - 1) * 10
 			posts := []models.Post{}
-			queryInputTags := "{" + strings.Join(body.Tags, ",") + "}"
-			commaSeparatedTags := strings.Join(body.Tags, ",")
+			selectedTagsStr := ""
+			if len(body.Tags) > 0 {
+				selectedTagsStr = strings.Join(body.Tags, ",")
+			} else {
+				selectedTagsStr = c.Query("tags")
+			}
 
-			if commaSeparatedTags == "" {
+			queryInputTags := "{" + selectedTagsStr + "}"
+
+			if selectedTagsStr == "" {
 				if page == 0 {
 					c.Response().Header.Set("HX-Push-Url", "/posts")
 				}
-				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
+				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
+
+				if len(posts) == 0 {
+					return c.Send([]byte(""))
+				}
 
 				return c.Render("post_list", fiber.Map{
 					"Posts": posts,
@@ -212,13 +224,18 @@ func main() {
 				})
 			} else {
 				if page == 0 {
-					c.Response().Header.Set("HX-Push-Url", fmt.Sprintf("/posts?tags=%s", commaSeparatedTags))
+					c.Response().Header.Set("HX-Push-Url", fmt.Sprintf("/posts?tags=%s", selectedTagsStr))
 				}
-				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Order(clause.OrderByColumn{Column: clause.Column{Name: "created_at"}, Desc: true}).Offset(offset).Limit(10).Where("tags @> ?", queryInputTags).Find(&posts)
+				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
+
+				if len(posts) == 0 {
+					return c.Send([]byte(""))
+				}
 
 				return c.Render("post_list", fiber.Map{
-					"Posts": posts,
-					"Page":  nextPage,
+					"Posts":           posts,
+					"Page":            nextPage,
+					"SelectedTagsStr": selectedTagsStr,
 				})
 			}
 		}
