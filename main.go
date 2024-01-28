@@ -2,13 +2,11 @@ package main
 
 import (
 	"gofiber/controllers"
+	"gofiber/middleware"
 	"gofiber/models"
-	"strconv"
-	"strings"
 
 	"fmt"
 	"log"
-	"net/url"
 	"os"
 	"time"
 
@@ -19,16 +17,12 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/mustache/v2"
-	"gorm.io/gorm/clause"
 )
 
 func main() {
 	models.ConnectDB()
 	engine := mustache.New("./views", ".mustache")
-
-	app := fiber.New(fiber.Config{
-		Views: engine,
-	})
+	app := fiber.New(fiber.Config{Views: engine})
 
 	app.Use(compress.New())
 	app.Use(helmet.New(
@@ -49,22 +43,7 @@ func main() {
 		}))
 	app.Use(etag.New())
 	app.Use(recover.New())
-
-	app.Use(func(c *fiber.Ctx) error {
-		if isGet := (c.Method() == "GET"); isGet {
-			theme := c.Cookies("theme")
-			themeOptions := []models.ThemeOption{}
-			themeOptions = append(themeOptions, models.ThemeOption{Value: "light", Label: "🌞", Selected: theme == "light"})
-			themeOptions = append(themeOptions, models.ThemeOption{Value: "dark", Label: "🌘", Selected: theme == "dark"})
-			themeOptions = append(themeOptions, models.ThemeOption{
-				Value:    "system",
-				Label:    "🌎",
-				Selected: (theme != "light" && theme != "dark"),
-			})
-			c.Locals("ThemeOptions", themeOptions)
-		}
-		return c.Next()
-	})
+	app.Use(middleware.SetupThemes)
 
 	app.Static("/public", "./public", fiber.Static{
 		Compress:      true,
@@ -76,156 +55,13 @@ func main() {
 		},
 	})
 
-	app.Get("/", func(c *fiber.Ctx) error {
-		return c.Render("index", fiber.Map{
-			"Title":        "Hello, World!",
-			"Description":  "Find the latest job posts in the tech industry.",
-			"ThemeOptions": c.Locals("ThemeOptions"),
-		}, "layouts/main")
-	})
-
+	app.Get("/", controllers.GetHome)
 	app.Get("/monitor", monitor.New())
+	app.Get("/posts", controllers.GetPosts)
 
-	app.Get("/posts", func(c *fiber.Ctx) error {
-		cookie := new(models.Cookie)
-		postsChan := make(chan []models.Post)
-		tagsChan := make(chan []models.Tag)
-		selectedTagsStr := c.Query("tags")
-		selectedTags := strings.Split(selectedTagsStr, ",")
-		unescapedSelectedTags := []string{}
-		for _, selectedTag := range selectedTags {
-			escapedTag, err := url.QueryUnescape(selectedTag)
-			if err == nil {
-				// This is a hack to fix the fact that the "c++" tag is not being unescaped properly
-				if escapedTag == "c  " {
-					escapedTag = strings.ReplaceAll(escapedTag, " ", "+")
-				}
-				unescapedSelectedTags = append(unescapedSelectedTags, escapedTag)
-			}
-		}
-
-		go (func(p chan []models.Post) {
-			posts := []models.Post{}
-			if len(selectedTags) > 0 {
-				queryInputTags := "{" + strings.Join(unescapedSelectedTags, ",") + "}"
-				models.DBConn.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
-				p <- posts
-				return
-			} else {
-				models.DBConn.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
-				p <- posts
-			}
-		})(postsChan)
-
-		go (func(t chan []models.Tag) {
-			tags := []models.Tag{}
-			models.DBConn.Raw(`
-				SELECT unnest(tags) AS name, count(*)::text AS count
-				FROM posts
-				WHERE published_at IS NOT NULL
-				GROUP by name
-				ORDER BY count(*) DESC;
-			`).Scan(&tags)
-			t <- tags
-		})(tagsChan)
-
-		posts := <-postsChan
-		tags := <-tagsChan
-
-		selectedTagMap := map[string]bool{}
-		for _, selectedTag := range selectedTags {
-			selectedTagMap[selectedTag] = true
-		}
-
-		updatedTags := []models.Tag{}
-		for _, tag := range tags {
-			if selectedTagMap[tag.Name] {
-				tag.Selected = true
-			}
-			updatedTags = append(updatedTags, tag)
-		}
-
-		if err := c.CookieParser(cookie); err != nil {
-			return err
-		}
-
-		return c.Render("posts", fiber.Map{
-			"Description":     "Find the latest job posts in the tech industry.",
-			"Page":            "1",
-			"Posts":           posts,
-			"SelectedTagsStr": selectedTagsStr,
-			"Theme":           cookie.Theme,
-			"Tags":            updatedTags,
-			"ThemeOptions":    c.Locals("ThemeOptions"),
-			"Title":           "Job Posts",
-		}, "layouts/main")
-	})
-
-	app.Get("/partials/posts/details/:id", controllers.GetPostDetail)
-
-	app.Post("/partials/posts/search/:page", func(c *fiber.Ctx) error {
-		type Body struct{ Tags []string }
-		if pageStr, err := strconv.Atoi(c.Params("page", "0")); err != nil {
-			return err
-		} else {
-			body := Body{}
-			c.BodyParser(&body)
-			page := int(pageStr)
-			nextPage := page + 1
-			offset := (nextPage - 1) * 10
-			posts := []models.Post{}
-			selectedTagsStr := ""
-			if len(body.Tags) > 0 {
-				selectedTagsStr = strings.Join(body.Tags, ",")
-			} else {
-				selectedTagsStr = c.Query("tags")
-			}
-			unescapedSelectedTags := []string{}
-			for _, selectedTag := range strings.Split(selectedTagsStr, ",") {
-				escapedTag, err := url.QueryUnescape(selectedTag)
-				if err == nil {
-					// This is a hack to fix the fact that the "c++" tag is not being unescaped properly
-					if escapedTag == "c  " {
-						escapedTag = strings.ReplaceAll(escapedTag, " ", "+")
-					}
-					unescapedSelectedTags = append(unescapedSelectedTags, escapedTag)
-				}
-			}
-
-			queryInputTags := "{" + strings.Join(unescapedSelectedTags, ",") + "}"
-
-			if selectedTagsStr == "" {
-				if page == 0 {
-					c.Response().Header.Set("HX-Push-Url", "/posts")
-				}
-				models.DBConn.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
-
-				if len(posts) == 0 {
-					return c.Send([]byte(""))
-				}
-
-				return c.Render("post_list", fiber.Map{
-					"Posts": posts,
-					"Page":  nextPage,
-				})
-			} else {
-				if page == 0 {
-					c.Response().Header.Set("HX-Push-Url", fmt.Sprintf("/posts?tags=%s", selectedTagsStr))
-				}
-				models.DBConn.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
-
-				if len(posts) == 0 {
-					return c.Send([]byte(""))
-				}
-
-				return c.Render("post_list", fiber.Map{
-					"Posts":           posts,
-					"Page":            nextPage,
-					"SelectedTagsStr": selectedTagsStr,
-				})
-			}
-		}
-	})
+	partials := app.Group("/partials")
+	partials.Get("/posts/details/:id", controllers.GetPostDetail)
+	partials.Post("/posts/search/:page", controllers.PostSearchResultsPage)
 
 	PORT := "localhost:8000"
 	if os.Getenv("PORT") != "" {
