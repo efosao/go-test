@@ -18,9 +18,6 @@ func GetHome(c *fiber.Ctx) error {
 }
 
 func GetPosts(c *fiber.Ctx) error {
-	cookie := new(models.Cookie)
-	postsChan := make(chan []models.Post)
-	tagsChan := make(chan []models.Tag)
 	selectedTagsStr := c.Query("tags")
 	selectedTags := strings.Split(selectedTagsStr, ",")
 	unescapedSelectedTags := []string{}
@@ -34,6 +31,9 @@ func GetPosts(c *fiber.Ctx) error {
 			unescapedSelectedTags = append(unescapedSelectedTags, escapedTag)
 		}
 	}
+
+	postsChan := make(chan []models.Post)
+	tagsChan := make(chan []models.Tag)
 
 	go (func(p chan []models.Post) {
 		posts := []models.Post{}
@@ -76,6 +76,7 @@ func GetPosts(c *fiber.Ctx) error {
 		updatedTags = append(updatedTags, tag)
 	}
 
+	cookie := new(models.Cookie)
 	if err := c.CookieParser(cookie); err != nil {
 		return err
 	}
