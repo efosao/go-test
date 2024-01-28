@@ -1,6 +1,7 @@
 package main
 
 import (
+	"gofiber/controllers"
 	"gofiber/models"
 	"strconv"
 	"strings"
@@ -18,40 +19,11 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/mustache/v2"
-
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-
-	"github.com/Pacific73/gorm-cache/cache"
-	"github.com/Pacific73/gorm-cache/config"
 )
 
 func main() {
-	dsn := "host=efosa.me user=postgres password=5005227a52c02361b7e95a1f5acfc7f0 dbname=jobs_db port=44553 sslmode=disable TimeZone=America/Los_Angeles"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic("failed to connect database")
-	}
-
-	cache, _ := cache.NewGorm2Cache(&config.CacheConfig{
-		CacheLevel:           config.CacheLevelAll,
-		CacheStorage:         config.CacheStorageMemory,
-		InvalidateWhenUpdate: true,  // when u create/update/delete objects, invalidate cache
-		CacheTTL:             10000, // 5000 ms
-		// if length of objects retrieved one single time
-		// exceeds this number, don't cache
-		CacheMaxItemCnt: 20,
-	})
-	db.Use(cache)
-
-	sqlDB, err := db.DB()
-	if err != nil {
-		panic("failed to connect database")
-	}
-
-	sqlDB.SetMaxIdleConns(20)
-	sqlDB.SetMaxOpenConns(30)
+	models.ConnectDB()
 	engine := mustache.New("./views", ".mustache")
 
 	app := fiber.New(fiber.Config{
@@ -136,18 +108,18 @@ func main() {
 			posts := []models.Post{}
 			if len(selectedTags) > 0 {
 				queryInputTags := "{" + strings.Join(unescapedSelectedTags, ",") + "}"
-				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
+				models.DBConn.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
 				p <- posts
 				return
 			} else {
-				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
+				models.DBConn.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
 				p <- posts
 			}
 		})(postsChan)
 
 		go (func(t chan []models.Tag) {
 			tags := []models.Tag{}
-			db.Raw(`
+			models.DBConn.Raw(`
 				SELECT unnest(tags) AS name, count(*)::text AS count
 				FROM posts
 				WHERE published_at IS NOT NULL
@@ -189,16 +161,7 @@ func main() {
 		}, "layouts/main")
 	})
 
-	app.Get("/partials/posts/details/:id", func(c *fiber.Ctx) error {
-		id := c.Params("id")
-		post := &models.Post{}
-		db.Select("ID", "Title", "Description").Where(&models.Post{ID: id}).First(&post)
-		return c.Render("post_details", fiber.Map{
-			"Title":       post.Title,
-			"ID":          post.ID,
-			"Description": post.GetDescription(),
-		})
-	})
+	app.Get("/partials/posts/details/:id", controllers.GetPostDetail)
 
 	app.Post("/partials/posts/search/:page", func(c *fiber.Ctx) error {
 		type Body struct{ Tags []string }
@@ -235,7 +198,7 @@ func main() {
 				if page == 0 {
 					c.Response().Header.Set("HX-Push-Url", "/posts")
 				}
-				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
+				models.DBConn.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
 
 				if len(posts) == 0 {
 					return c.Send([]byte(""))
@@ -249,7 +212,7 @@ func main() {
 				if page == 0 {
 					c.Response().Header.Set("HX-Push-Url", fmt.Sprintf("/posts?tags=%s", selectedTagsStr))
 				}
-				db.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
+				models.DBConn.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
 
 				if len(posts) == 0 {
 					return c.Send([]byte(""))
