@@ -3,7 +3,7 @@ package middleware
 import (
 	"gofiber/models"
 
-	"github.com/gofiber/fiber"
+	"github.com/gofiber/fiber/v2"
 )
 
 func SetupThemes(c *fiber.Ctx) error {
