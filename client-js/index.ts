@@ -63,8 +63,7 @@ const utils = {
       for (const select of document.getElementsByClassName("slim-select")) {
         /* @ts-ignore */
         if (typeof select.slim !== "undefined") {
-          /* @ts-ignore */
-          select.slim.destroy();
+          return;
         }
         select.classList.remove("hide");
         new SlimSelect({
@@ -88,9 +87,45 @@ window
 
 window.utils = utils;
 
+function loadEventListeners() {
+  console.debug("DOMContentLoaded");
+
+  const showButton = document.getElementById("dialog_button");
+  const closeButton = document.querySelector("dialog button");
+
+  window.addEventListener("click", (e) => {
+    const dialog = document.getElementById(
+      "dialog"
+    ) as HTMLDialogElement | null;
+    if (e.target === dialog) {
+      dialog?.close();
+    }
+  });
+
+  showButton?.addEventListener("click", () => {
+    const dialog = document.getElementById(
+      "dialog"
+    ) as HTMLDialogElement | null;
+    dialog?.showModal();
+  });
+
+  closeButton?.addEventListener("click", () => {
+    const dialog = document.getElementById(
+      "dialog"
+    ) as HTMLDialogElement | null;
+    dialog?.close();
+  });
+}
+
 window.document.addEventListener("DOMContentLoaded", () => {
   Alpine.start();
   utils.init();
+  loadEventListeners();
+});
+
+htmx.onLoad(function (content) {
+  console.debug("htmx.onLoad");
+  loadEventListeners();
 });
 
 if (htmx && ENABLE_HTMX_DEBUG) {
