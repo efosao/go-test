@@ -8,7 +8,7 @@
   <form class="select-none" onchange="utils.setTheme(event)">
       <label class="flex items-center">
         <span class="text-slate-900 dark:text-slate-900">theme</span>
-        <select name="themepicker" class="ml-2 dark:bg-slate-600">
+        <select name="themepicker" class="ml-2 border-none dark:bg-slate-500">
         {{#ThemeOptions}}
         <option class="bg-transparent" {{#Selected}}selected{{/Selected}} value="{{Value}}">{{Label}}</option>
         {{/ThemeOptions}}

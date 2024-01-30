@@ -2,6 +2,7 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 @import "../node_modules/slim-select/dist/slimselect.css";
+@import "./dialog.css";
 @import "./external.css";
 
 /* 
@@ -500,4 +501,8 @@ form div.ProseMirror {
   transform: rotate(45deg);
   opacity: 0.45;
   @apply absolute left-9 top-3 border-gray-800;
+}
+
+:is(.dark dialog p) {
+  @apply text-gray-900;
 }
