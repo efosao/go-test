@@ -16,12 +16,12 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/recover"
-	"github.com/gofiber/template/mustache/v2"
+	"github.com/gofiber/template/html/v2"
 )
 
 func main() {
 	models.ConnectDB()
-	engine := mustache.New("./views", ".mustache")
+	engine := html.New("./views", ".tpl")
 	app := fiber.New(fiber.Config{Views: engine})
 
 	app.Use(compress.New())
@@ -56,8 +56,8 @@ func main() {
 	})
 
 	app.Get("/", controllers.GetHome)
-	app.Get("/monitor", monitor.New())
 	app.Get("/posts", controllers.GetPosts)
+	app.Get("/monitor", monitor.New())
 
 	partials := app.Group("/partials")
 	partials.Get("/posts/details/:id", controllers.GetPostDetail)

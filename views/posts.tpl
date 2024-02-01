@@ -1,5 +1,5 @@
 <div class="mb-4 h-10">
-  <select    
+  <select
     aria-hidden="true"
     class="hide slim-select"
     hx-post="/partials/posts/search/0"
@@ -7,17 +7,14 @@
     hx-trigger="change"
     id="tags"
     name="tags"
-    tabindex="-1"
     multiple
+    tabindex="-1"
     x-init="window.utils.loadSlimSelect"
   >
-    {{#Tags}}
-      <option value="{{GetEscapedName}}" {{#Selected}}selected{{/Selected}}>{{Name}}</option>
-    {{/Tags}} 
+    {{range .Tags}}<option value="{{.GetEscapedName}}" {{- if .Selected}}selected{{end}}>{{.Name}}</option>{{end}}
   </select>
 </div>
 
-
 <div id="post-list">
-{{> views/post_list }}
+{{template "post_list" .}}
 </div>

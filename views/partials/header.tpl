@@ -9,9 +9,9 @@
       <label class="flex items-center">
         <span class="text-slate-900 dark:text-slate-900">theme</span>
         <select name="themepicker" class="ml-2 border-none dark:bg-slate-500">
-        {{#ThemeOptions}}
-        <option class="bg-transparent" {{#Selected}}selected{{/Selected}} value="{{Value}}">{{Label}}</option>
-        {{/ThemeOptions}}
+        {{range .ThemeOptions}}
+        <option class="bg-transparent" {{if .Selected}}selected{{end}} value="{{.Value}}">{{.Label}}</option>
+        {{end}}
         </select>
       </label>
     </form>

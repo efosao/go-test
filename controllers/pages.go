@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"gofiber/models"
 	"net/url"
 	"strings"
@@ -10,6 +11,7 @@ import (
 )
 
 func GetHome(c *fiber.Ctx) error {
+	fmt.Println("Home page")
 	return c.Render("index", fiber.Map{
 		"Title":        "Hello, World!",
 		"Description":  "Find the latest job posts in the tech industry.",
@@ -81,7 +83,7 @@ func GetPosts(c *fiber.Ctx) error {
 		return err
 	}
 
-	return c.Render("posts", fiber.Map{
+	data := fiber.Map{
 		"Description":     "Find the latest job posts in the tech industry.",
 		"Page":            "1",
 		"Posts":           posts,
@@ -90,5 +92,7 @@ func GetPosts(c *fiber.Ctx) error {
 		"Tags":            updatedTags,
 		"ThemeOptions":    c.Locals("ThemeOptions"),
 		"Title":           "Job Posts",
-	}, "layouts/main")
+	}
+
+	return c.Render("posts", data, "layouts/main")
 }

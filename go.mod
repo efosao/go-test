@@ -6,7 +6,7 @@ require (
 	github.com/Pacific73/gorm-cache v1.1.1
 	github.com/go-mods/initials v0.0.0-20230701135643-af0016df88f8
 	github.com/gofiber/fiber/v2 v2.52.0
-	github.com/gofiber/template/mustache/v2 v2.0.8
+	github.com/gofiber/template/html/v2 v2.1.0
 	github.com/gomarkdown/markdown v0.0.0-20231222211730-1d6d20845b47
 	github.com/lib/pq v1.10.9
 	gorm.io/driver/postgres v1.5.4
@@ -15,7 +15,6 @@ require (
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
-	github.com/cbroglie/mustache v1.4.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
