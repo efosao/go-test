@@ -2,7 +2,6 @@
   <div>
     <a class="p-2 inline-block" href="/">Home</a>
     <a class="p-2 inline-block" href="/posts">Job Posts</a>
-    <a class="p-2 inline-block" href="/monitor" target="_blank">Fiber Monitor</a>
   </div>
 
   <form class="select-none" onchange="utils.setTheme(event)">

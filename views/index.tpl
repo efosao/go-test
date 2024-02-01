@@ -1,12 +1,14 @@
 <section>
   <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
 
- <dialog id="dialog" class="rounded-xl">
-  <div class="p-4 min-w-56 min-h-36 shadow-xl text-black">
-  <button class="button" autofocus>Close</button>
-  <p>This modal dialog has a groovy backdrop!</p>
+ <dialog id="dialog" class="rounded-xl shadow-xl shadow-slate-800 ">
+  <div class="rounded-xl p-4 min-w-56 min-h-36 text-black border-2 border-slate-300 relative ">
+  <button class="absolute right-2 top-1 bg-[transparent!important]"><img height="32" width="32" src="/public/images/close.svg" /></button>
+  <div class="mt-8">
+  <p >This modal dialog has a groovy backdrop!</p></div>
   </div>
 </dialog>
+
 <button class="button" id="dialog_button">Show test dialog</button>
 
 
