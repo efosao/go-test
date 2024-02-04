@@ -91,7 +91,6 @@ function loadEventListeners() {
   console.debug("DOMContentLoaded");
 
   const showButton = document.getElementById("dialog_button");
-  const closeButton = document.querySelector("dialog button");
 
   window.addEventListener("click", (e) => {
     const dialog = document.getElementById(
@@ -109,11 +108,15 @@ function loadEventListeners() {
     dialog?.showModal();
   });
 
-  closeButton?.addEventListener("click", () => {
-    const dialog = document.getElementById(
-      "dialog"
-    ) as HTMLDialogElement | null;
-    dialog?.close();
+  const closeButtons = document.querySelectorAll("dialog button.close");
+
+  closeButtons.forEach((el) => {
+    el.addEventListener("click", () => {
+      const dialog = document.getElementById(
+        "dialog"
+      ) as HTMLDialogElement | null;
+      dialog?.close();
+    });
   });
 }
 

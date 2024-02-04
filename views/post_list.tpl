@@ -35,29 +35,29 @@
         {{.GetInitials}}
       </span>
       {{end}}
-      <div class="flex grow flex-col">
-      <p class="text-black line-clamp-1 font-semibold lg:line-clamp-2">
-        {{.CompanyName}}
-      </p>
+      <div class="flex grow flex-col min-w-10">
+        <p class="text-black line-clamp-1 font-semibold lg:line-clamp-2">
+          {{- .CompanyName}}
+        </p>
 
-      <p class="text-black line-clamp-1 font-bold md:line-clamp-2 max-w-80">
-        {{.Title}}</p>
-      <p class="text-black">{{.Location}}</p>
+        <p class="text-black line-clamp-1 font-bold md:line-clamp-2">
+          {{- .Title}}</p>
+        <p class="text-black">{{.Location}}</p>
 
-      <!-- <p>
-        {isRemote ? (
-          <>
-            Remote&nbsp;
-            {post.location && (
-              <span class="text-orange-700 dark:text-orange-300">
-                ({post.location.trim()})
-              </span>
-            )}
-          </>
-        ) : (
-          <>{post.location}</>
-        )}
-      </p> -->
+        <!-- <p>
+          {isRemote ? (
+            <>
+              Remote&nbsp;
+              {post.location && (
+                <span class="text-orange-700 dark:text-orange-300">
+                  ({post.location.trim()})
+                </span>
+              )}
+            </>
+          ) : (
+            <>{post.location}</>
+          )}
+        </p> -->
     </div>
     <div class="tag-container">
     {{range .Tags}}
@@ -133,5 +133,3 @@
     <div class="bg-orange-200 dark:bg-slate-800 rounded-md h-36 w-full"></div>
   </div>
 </div>
-
-

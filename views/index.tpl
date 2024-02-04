@@ -1,12 +1,21 @@
 <section>
   <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
 
- <dialog id="dialog" class="rounded-xl shadow-xl shadow-slate-800 ">
-  <div class="rounded-xl p-4 min-w-56 min-h-36 text-black border-2 border-slate-300 relative ">
-  <button class="absolute right-2 top-1 bg-[transparent!important]"><img height="32" width="32" src="/public/images/close.svg" /></button>
-  <div class="mt-8">
-  <p >This modal dialog has a groovy backdrop!</p></div>
-  </div>
+ <dialog id="dialog" class="rounded-xl shadow-xl shadow-slate-800 fade-in-bottom overflow-hidden">
+  <div class="rounded-xl p-4 min-w-80 min-h-52 text-black border-2 border-slate-300 relative ">
+  <button class="close absolute right-2 top-1 bg-[transparent!important]"><img height="32" width="32" src="/public/images/close.svg" /></button>
+  <form class="flex flex-col gap-2" method="post">
+    <div class="mt-8">
+      <p >This modal dialog has a groovy backdrop!</p>
+    </div>
+
+    <input type="text" name="name" autofocus autocapitalize="" autocomplete="name" placeholder="Enter your name" required />
+    <input type="email" name="email" autocomplete="email" placeholder="Enter your email" required />
+    <div class="flex justify-end gap-2">
+      <button class="button bg-transparent close" type="button" value="cancel" formnovalidate formmethod="dialog">Cancel</button>
+      <button class="button btn-apply" type="submit">Submit</button>
+    </div>
+  </form>
 </dialog>
 
 <button class="button" id="dialog_button">Show test dialog</button>

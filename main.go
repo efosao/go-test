@@ -14,6 +14,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/compress"
 	"github.com/gofiber/fiber/v2/middleware/etag"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/monitor"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/template/html/v2"
@@ -25,6 +26,7 @@ func main() {
 	app := fiber.New(fiber.Config{Views: engine})
 
 	app.Use(compress.New())
+	app.Use(logger.New())
 	app.Use(helmet.New(
 		helmet.Config{
 			ContentSecurityPolicy: `
@@ -56,6 +58,7 @@ func main() {
 	})
 
 	app.Get("/", controllers.GetHome)
+	app.Post("/", controllers.GetHome)
 	app.Get("/posts", controllers.GetPosts)
 	app.Get("/monitor", monitor.New())
 
