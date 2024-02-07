@@ -1,6 +1,10 @@
 <section>
   <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
 
+  <h3>Preact Web-Components Test</h3>
+  <x-greeting></x-greeting>
+  <x-greeting name="Efosa"></x-greeting>
+
  <dialog id="dialog" class="rounded-xl shadow-xl shadow-slate-800 fade-in-bottom overflow-hidden">
   <div class="rounded-xl p-4 min-w-80 min-h-52 text-black border-2 border-slate-300 relative ">
   <button class="close absolute right-2 top-1 bg-[transparent!important]"><img height="32" width="32" src="/public/images/close.svg" /></button>

@@ -4,6 +4,7 @@ import htmx from "htmx.org";
 import Cookies from "js-cookie";
 import SlimSelect from "../node_modules/slim-select/src/slim-select/index";
 import Alpine from "alpinejs";
+import "./preact";
 
 declare global {
   interface Window {
