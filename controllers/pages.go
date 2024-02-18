@@ -129,10 +129,10 @@ func AboutPage(config *Config) g.Node {
 				c.Classes{"mx-auto max-w-screen-xl": true},
 				h.H3(
 					c.Classes{"text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10": true},
-					g.Text("Preact Web-Components Test"),
+					g.Text("Lit Web-Components === ❤️"),
 				),
+				g.Raw("<x-greeting count=5></x-greeting>"),
 				g.Raw("<x-greeting count=15></x-greeting>"),
-				g.Raw("<x-greeting count=15 name=\"Efosa\"></x-greeting>"),
 			),
 			h.Button(
 				c.Classes{"button": true},
@@ -185,6 +185,7 @@ func AboutPage(config *Config) g.Node {
 func Layout(title string, config *Config, children g.Node) g.Node {
 	return h.Doctype(
 		h.HTML(
+			c.Classes{config.theme: true},
 			hx.Boost("true"),
 			h.Lang("en"),
 			h.Head(
@@ -194,7 +195,7 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 				h.Script(h.Src("/public/dist/index.js"), h.Defer()),
 			),
 			h.Body(
-				c.Classes{"max-w-4xl mx-auto dark:bg-slate-500": true, config.theme: true},
+				c.Classes{"max-w-4xl mx-auto dark:bg-slate-500": true},
 				Navbar(config),
 				h.H1(
 					c.Classes{"text-3xl font-extrabold mb-4 text-black dark:text-black": true},
