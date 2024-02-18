@@ -1,12 +1,14 @@
 package main
 
 import (
+	"context"
 	"gofiber/controllers"
 	"gofiber/middleware"
 	"gofiber/models"
 
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -20,10 +22,38 @@ import (
 	"github.com/gofiber/template/html/v2"
 )
 
+func middlewareOne(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Print("Executing middlewareOne")
+
+		// theme := c.Cookies("theme")
+		cookies := r.Cookies()
+		cookiesMap := map[string]string{}
+		for _, cookie := range cookies {
+			cookiesMap[cookie.Name] = cookie.Value
+		}
+		theme := cookiesMap["theme"]
+		themeOptions := []models.ThemeOption{}
+		themeOptions = append(themeOptions, models.ThemeOption{Value: "light", Label: "🌞", Selected: theme == "light"})
+		themeOptions = append(themeOptions, models.ThemeOption{Value: "dark", Label: "🌘", Selected: theme == "dark"})
+		themeOptions = append(themeOptions, models.ThemeOption{
+			Value:    "system",
+			Label:    "🌎",
+			Selected: (theme != "light" && theme != "dark"),
+		})
+
+		ctx := context.WithValue(r.Context(), "themeOption", themeOptions)
+		ctx = context.WithValue(ctx, "theme", theme)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
 func main() {
 	models.ConnectDB()
 	engine := html.New("./views", ".tpl")
-	app := fiber.New(fiber.Config{Views: engine})
+	app := fiber.New(fiber.Config{
+		Views: engine,
+	})
 
 	app.Use(compress.New())
 	app.Use(logger.New())
@@ -57,6 +87,12 @@ func main() {
 		},
 	})
 
+	fs := http.FileServer(http.Dir("public"))
+	http.Handle("GET /{$}", middlewareOne(http.HandlerFunc(controllers.GetAbout)))
+	http.Handle("GET /about/{$}", middlewareOne(http.HandlerFunc(controllers.GetAbout)))
+	http.Handle("GET /posts/{$}", middlewareOne(http.HandlerFunc(controllers.GetAbout)))
+	http.Handle("GET /public/", http.StripPrefix("/public/", fs))
+
 	app.Get("/", controllers.GetHome)
 	app.Post("/", controllers.GetHome)
 	app.Get("/posts", controllers.GetPosts)
@@ -70,6 +106,8 @@ func main() {
 	if os.Getenv("PORT") != "" {
 		PORT = fmt.Sprintf(":%s", os.Getenv("PORT"))
 	}
+
+	log.Fatal(http.ListenAndServe("localhost:8080", nil))
 
 	log.Fatal(app.Listen(PORT))
 }
