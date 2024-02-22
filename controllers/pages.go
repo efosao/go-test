@@ -108,10 +108,10 @@ type Config struct {
 }
 
 func GetAbout(w http.ResponseWriter, r *http.Request) {
-	if themeOptions, ok := r.Context().Value("themeOption").([]models.ThemeOption); ok {
+	if themeOptions, ok := r.Context().Value(models.ThemeOptionsKey).([]models.ThemeOption); ok {
 		config := &Config{
 			path:         r.URL.Path,
-			theme:        r.Context().Value("theme").(string),
+			theme:        r.Context().Value(models.ThemeKey).(string),
 			themeOptions: themeOptions,
 		}
 		fmt.Println("config", config)
