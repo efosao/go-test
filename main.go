@@ -100,5 +100,8 @@ func main() {
 
 	hostAddr := fmt.Sprintf("localhost%s", PORT)
 
+	println("Server running on port", PORT)
+	println("Server running on hostAddr", hostAddr)
+
 	log.Fatal(http.ListenAndServe(hostAddr, handlers.CompressHandler(r)))
 }
