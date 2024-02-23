@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"gofiber/models"
-	"html/template"
 	"net/url"
 	"strconv"
 	"strings"
@@ -11,24 +10,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm/clause"
 )
-
-func GetPostDetail(c *fiber.Ctx) error {
-	id := c.Params("id")
-	post := &models.Post{}
-	if err := models.DBConn.Select("ID", "Title", "Description").Where(&models.Post{ID: id}).First(&post).Error; err != nil {
-		if err.Error() == "record not found" {
-			return c.Status(404).Send([]byte("Post not found"))
-		} else {
-			return c.Status(500).Send([]byte("Internal Server Error"))
-		}
-	}
-
-	return c.Render("post_details", fiber.Map{
-		"Title":       post.Title,
-		"ID":          post.ID,
-		"Description": template.HTML(post.GetDescription()),
-	})
-}
 
 func PostSearchResultsPage(c *fiber.Ctx) error {
 	type Body struct{ Tags []string }

@@ -47,7 +47,12 @@ const utils = {
       checkboxId
     ) as HTMLInputElement;
     checkbox.checked = !checkbox.checked;
-    window.__htmx.trigger("#" + descriptionId, "change");
+    const description: HTMLElement = document.getElementById(
+      descriptionId
+    ) as HTMLElement;
+    if (description) {
+      window.__htmx.trigger("#" + descriptionId, "change");
+    }
   },
 
   setTheme: (event: { target: { value: "light" | "dark" | "system" } }) => {

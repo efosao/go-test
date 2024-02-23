@@ -7,7 +7,6 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
 	g "github.com/maragudk/gomponents"
 	hx "github.com/maragudk/gomponents-htmx"
 	c "github.com/maragudk/gomponents/components"
@@ -15,16 +14,41 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-func GetHome(c *fiber.Ctx) error {
-	return c.Render("index", fiber.Map{
-		"Title":        "Hello, World!",
-		"Description":  "Find the latest job posts in the tech industry.",
-		"ThemeOptions": c.Locals("ThemeOptions"),
-	}, "layouts/main")
+func GetHome(w http.ResponseWriter, r *http.Request) {
+	if themeOptions, ok := r.Context().Value(models.ThemeOptionsKey).([]models.ThemeOption); ok {
+		config := &Config{
+			path:         r.URL.Path,
+			theme:        r.Context().Value(models.ThemeKey).(string),
+			themeOptions: themeOptions,
+		}
+		fmt.Println("config", config)
+		HomePage(config).Render(w)
+	} else {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+	}
 }
 
-func GetPosts(c *fiber.Ctx) error {
-	selectedTagsStr := c.Query("tags")
+func HomePage(config *Config) g.Node {
+	return Layout("Home", config,
+		h.Section(
+			c.Classes{"my-4": true},
+			h.Div(
+				c.Classes{"mx-auto max-w-screen-xl": true},
+				h.H3(
+					c.Classes{"text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10": true},
+					g.Text("Welcome to the job board"),
+				),
+				h.P(
+					c.Classes{"mt-4 text-lg leading-7 text-gray-500": true},
+					g.Text("This is a job board for the modern web."),
+				),
+			),
+		),
+	)
+}
+
+func GetPosts(w http.ResponseWriter, r *http.Request) {
+	selectedTagsStr := r.URL.Query().Get("tags")
 	selectedTags := strings.Split(selectedTagsStr, ",")
 	unescapedSelectedTags := []string{}
 	for _, selectedTag := range selectedTags {
@@ -82,23 +106,132 @@ func GetPosts(c *fiber.Ctx) error {
 		updatedTags = append(updatedTags, tag)
 	}
 
-	cookie := new(models.Cookie)
-	if err := c.CookieParser(cookie); err != nil {
-		return err
+	config := &Config{
+		path:         r.URL.Path,
+		theme:        r.Context().Value(models.ThemeKey).(string),
+		themeOptions: r.Context().Value(models.ThemeOptionsKey).([]models.ThemeOption),
 	}
 
-	data := fiber.Map{
-		"Description":     "Find the latest job posts in the tech industry.",
-		"Page":            "1",
-		"Posts":           posts,
-		"SelectedTagsStr": selectedTagsStr,
-		"Theme":           cookie.Theme,
-		"Tags":            updatedTags,
-		"ThemeOptions":    c.Locals("ThemeOptions"),
-		"Title":           "Job Posts",
-	}
+	PostsPage(config, posts, updatedTags).Render(w)
+}
 
-	return c.Render("posts", data, "layouts/main")
+func PostsPage(config *Config, posts []models.Post, tags []models.Tag) g.Node {
+	return Layout("Posts", config,
+		h.Section(
+			c.Classes{"my-4": true},
+			h.Select(
+				c.Classes{"hide slim-select": true},
+				h.ID("tags"),
+				h.Name("tags"),
+				hx.Post("/partials/posts/search/0"),
+				hx.Target("#post-list"),
+				hx.Trigger("change"),
+				h.Multiple(),
+				h.TabIndex("-1"),
+				g.Attr("aria-hidden", "true"),
+				g.Attr("x-init", "window.utils.loadSlimSelect"),
+				g.Group(g.Map(tags, func(tag models.Tag) g.Node {
+					return h.Option(
+						h.Value(tag.Name),
+						g.If(tag.Selected, h.Selected()),
+						g.Text(tag.Name),
+					)
+				})),
+			),
+			h.Div(
+				Posts(posts),
+			),
+		),
+	)
+}
+
+func Posts(posts []models.Post) g.Node {
+	return h.Div(
+		h.Class("mt-4"),
+		g.Group(g.Map(posts, func(post models.Post) g.Node {
+			return Post(post)
+		})),
+	)
+}
+
+func Post(post models.Post) g.Node {
+	return h.Div(
+		c.Classes{"search_row group relative mb-2 rounded-md border-0 border-orange-200 bg-orange-200 text-black dark:border-slate-700 dark:bg-slate-700 dark:text-white": true},
+		g.Attr("onclick", "utils.toggleOpenState('cbx"+post.ID+"', 'desc"+post.ID+"')"),
+		h.Div(
+			c.Classes{"cursor-pointer flex h-32 items-center space-x-2 px-2": true},
+			g.If(post.Thumbnail != "", h.Span(
+				c.Classes{"rounded-full initials inline-flex h-[40px] w-[40px] my-2 shrink-0 items-center justify-center overflow-hidden": true},
+				h.Img(h.Src(post.Thumbnail), h.Width("40"), h.Height("40")),
+			)),
+			g.If(post.Thumbnail == "", h.Span(
+				c.Classes{"bg-teal-300 rounded-full initials inline-flex h-[40px] w-[40px] my-2 shrink-0 items-center justify-center overflow-hidden": true},
+				g.Text("AB"),
+				// g.Text(post.GetInitials),
+			)),
+			h.Div(
+				c.Classes{"flex grow": true},
+				h.Div(
+					c.Classes{"flex grow flex-col min-w-10": true},
+
+					h.P(
+						c.Classes{"text-black line-clamp-1 font-semibold lg:line-clamp-2": true},
+						g.Text(post.CompanyName),
+					),
+					h.P(
+						c.Classes{"text-black line-clamp-1 font-bold md:line-clamp-2": true},
+						g.Text(post.Title),
+					),
+					h.P(
+						c.Classes{"text-black": true},
+						g.Text(post.Location),
+					),
+				),
+				h.Div(
+					c.Classes{"tag-container": true},
+					g.Group(g.Map(post.Tags, func(tag string) g.Node {
+						return h.Button(
+							c.Classes{"inline cursor-pointer rounded-md bg-white px-2 font-semibold text-pink-950 transition-colors duration-300 hover:bg-blue-100 hover:text-black my-[2px]": true},
+							g.Text(tag),
+						)
+					}))),
+			),
+			h.Span(
+				c.Classes{"m-2": true},
+				g.Text("69 days ago"),
+				// g.Text(post.TimeSinceCreated),
+			),
+			h.Span(
+				c.Classes{"btn-apply done": true},
+				g.Text("Applied"),
+			),
+		),
+		h.Div(
+			c.Classes{"flex flex-col items-center justify-center": true},
+			h.Input(
+				h.Type("checkbox"),
+				h.ID("cbx"+post.ID),
+				g.Attr("aria-label", "toggle show description"),
+				h.Class("peer hidden"),
+			),
+			h.Div(
+				h.Class("hidden p-4 peer-checked:flex"),
+				h.Div(
+					h.Class("items-center justify-center"),
+					g.Attr("hx-get", "/posts/details/"+post.ID),
+					g.Attr("hx-indicator", "#htmx"+post.ID),
+					g.Attr("hx-swap", "outerHTML transition:true"),
+					g.Attr("hx-trigger", "change"),
+					h.ID("desc"+post.ID),
+					h.Img(
+						h.ID("htmx"+post.ID),
+						h.Src("/public/images/bars-loader.svg"),
+						h.Height("48"),
+					),
+				),
+			),
+		),
+	)
 }
 
 type Config struct {
@@ -182,6 +315,42 @@ func AboutPage(config *Config) g.Node {
 	)
 }
 
+func GetPostDetail(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	post := &models.Post{}
+	if err := models.DBConn.Select("ID", "Title", "Description").Where(&models.Post{ID: id}).First(&post).Error; err != nil {
+		if err.Error() == "record not found" {
+			w.WriteHeader(404)
+			w.Write([]byte("Post not found"))
+		} else {
+			w.WriteHeader(500)
+			w.Write([]byte("Internal Server Error"))
+		}
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	w.WriteHeader(200)
+
+	PostDetailPage(post).Render(w)
+}
+
+func PostDetailPage(post *models.Post) g.Node {
+	return h.Section(
+		c.Classes{"my-4": true},
+		h.Div(
+			c.Classes{"mx-auto max-w-screen-xl": true},
+			h.H3(
+				c.Classes{"text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10": true},
+				g.Text(post.Title),
+			),
+			h.P(
+				c.Classes{"mt-4 text-lg leading-7 text-gray-500": true},
+				g.Text(post.Description),
+			),
+		),
+	)
+}
+
 func Layout(title string, config *Config, children g.Node) g.Node {
 	return h.Doctype(
 		h.HTML(
@@ -214,8 +383,8 @@ func Navbar(config *Config) g.Node {
 		h.Div(
 			c.Classes{"flex gap-2": true},
 			NavbarLink("/", "Home", currentPath),
-			NavbarLink("/posts/", "Job Posts", currentPath),
 			NavbarLink("/about/", "About", currentPath),
+			NavbarLink("/posts/", "Job Posts", currentPath),
 			g.Text("👀"),
 		),
 		h.FormEl(
