@@ -1,14 +1,19 @@
 package middleware
 
 import (
+	"context"
 	"gofiber/models"
-
-	"github.com/gofiber/fiber/v2"
+	"net/http"
 )
 
-func SetupThemes(c *fiber.Ctx) error {
-	if isGet := (c.Method() == "GET"); isGet {
-		theme := c.Cookies("theme")
+func ReadThemeMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cookies := r.Cookies()
+		cookiesMap := map[string]string{}
+		for _, cookie := range cookies {
+			cookiesMap[cookie.Name] = cookie.Value
+		}
+		theme := cookiesMap["theme"]
 		themeOptions := []models.ThemeOption{}
 		themeOptions = append(themeOptions, models.ThemeOption{Value: "light", Label: "🌞", Selected: theme == "light"})
 		themeOptions = append(themeOptions, models.ThemeOption{Value: "dark", Label: "🌘", Selected: theme == "dark"})
@@ -17,8 +22,9 @@ func SetupThemes(c *fiber.Ctx) error {
 			Label:    "🌎",
 			Selected: (theme != "light" && theme != "dark"),
 		})
-		c.Locals("ThemeOptions", themeOptions)
-	}
-	c.Next()
-	return nil
+
+		ctx := context.WithValue(r.Context(), models.ThemeOptionsKey, themeOptions)
+		ctx = context.WithValue(ctx, models.ThemeKey, theme)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
