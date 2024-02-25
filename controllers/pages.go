@@ -21,7 +21,6 @@ func GetHome(w http.ResponseWriter, r *http.Request) {
 			theme:        r.Context().Value(models.ThemeKey).(string),
 			themeOptions: themeOptions,
 		}
-		fmt.Println("config", config)
 		HomePage(config).Render(w)
 	} else {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -112,51 +111,92 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		themeOptions: r.Context().Value(models.ThemeOptionsKey).([]models.ThemeOption),
 	}
 
-	PostsPage(config, posts, updatedTags).Render(w)
+	PostsPage(config, posts, updatedTags, selectedTagsStr, 1).Render(w)
 }
 
-func PostsPage(config *Config, posts []models.Post, tags []models.Tag) g.Node {
+func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedTags string, page int) g.Node {
+	nextPage := page + 1
+
 	return Layout("Posts", config,
 		h.Section(
-			c.Classes{"my-4": true},
-			h.Select(
-				c.Classes{"hide slim-select": true},
-				h.ID("tags"),
-				h.Name("tags"),
-				hx.Post("/partials/posts/search/0"),
-				hx.Target("#post-list"),
-				hx.Trigger("change"),
-				h.Multiple(),
-				h.TabIndex("-1"),
-				g.Attr("aria-hidden", "true"),
-				g.Attr("x-init", "window.utils.loadSlimSelect"),
-				g.Group(g.Map(tags, func(tag models.Tag) g.Node {
-					return h.Option(
-						h.Value(tag.Name),
-						g.If(tag.Selected, h.Selected()),
-						g.Text(tag.Name),
-					)
-				})),
+			h.Class("my-4"),
+			h.Div(
+				h.Class("h-10"),
+				h.Select(
+					c.Classes{"hidden slim-select": true},
+					h.ID("tags"),
+					h.Name("tags"),
+					hx.Post("/partials/posts/search/0"),
+					hx.Target("#post-list"),
+					hx.Trigger("change"),
+					h.Multiple(),
+					h.TabIndex("-1"),
+					g.Attr("aria-hidden", "true"),
+					g.Attr("x-init", "window.utils.loadSlimSelect"),
+					g.Group(g.Map(tags, func(tag models.Tag) g.Node {
+						return h.Option(
+							h.Value(tag.Name),
+							g.If(tag.Selected, h.Selected()),
+							g.Text(tag.Name),
+						)
+					})),
+				),
 			),
 			h.Div(
-				Posts(posts),
+				Posts(posts, selectedTags, nextPage),
 			),
 		),
 	)
 }
 
-func Posts(posts []models.Post) g.Node {
+func Posts(posts []models.Post, selectedTags string, nextPage int) g.Node {
+	nextPgUrl := fmt.Sprint("/partials/posts/search/", nextPage)
+	if selectedTags != "" {
+		nextPgUrl = fmt.Sprint("/partials/posts/search/", nextPage, "?tags=", selectedTags)
+	}
+
 	return h.Div(
+		h.ID("post-list"),
 		h.Class("mt-4"),
 		g.Group(g.Map(posts, func(post models.Post) g.Node {
 			return Post(post)
 		})),
+		h.Div(
+			g.Attr("hx-post", nextPgUrl),
+			g.Attr("hx-swap", "outerHTML"),
+			g.Attr("hx-trigger", "revealed"),
+			h.ID("nextPageLoaderId_"+fmt.Sprint(nextPage)),
+			h.Class("htmx-indicator flex flex-col gap-2 items-center justify-center"),
+			h.Div(
+				h.Class("bg-orange-200 dark:bg-slate-800 rounded-md h-36 w-full"),
+			),
+			h.Div(
+				h.Class("bg-orange-200 dark:bg-slate-800 rounded-md h-36 w-full"),
+			),
+			h.Div(
+				h.Class("bg-orange-200 dark:bg-slate-800 rounded-md h-36 w-full"),
+			),
+			h.Div(
+				h.Class("bg-orange-200 dark:bg-slate-800 rounded-md h-36 w-full"),
+			),
+			h.Div(
+				h.Class("bg-orange-200 dark:bg-slate-800 rounded-md h-36 w-full"),
+			),
+			h.Div(
+				h.Class("bg-orange-200 dark:bg-slate-800 rounded-md h-36 w-full"),
+			),
+		),
 	)
 }
 
 func Post(post models.Post) g.Node {
+	class := "search_row group relative mb-2 rounded-md border-0 border-pink-200 bg-pink-100 dark:border-prussian-blue-900 dark:bg-black dark:text-white"
+	if post.IsPinned() {
+		class = "search_row group relative mb-2 rounded-md border-0 border-orange-200 bg-orange-200 text-black dark:border-slate-700 dark:bg-slate-700 dark:text-white"
+	}
+
 	return h.Div(
-		c.Classes{"search_row group relative mb-2 rounded-md border-0 border-orange-200 bg-orange-200 text-black dark:border-slate-700 dark:bg-slate-700 dark:text-white": true},
+		h.Class(class),
 		g.Attr("onclick", "utils.toggleOpenState('cbx"+post.ID+"', 'desc"+post.ID+"')"),
 		h.Div(
 			c.Classes{"cursor-pointer flex h-32 items-center space-x-2 px-2": true},
@@ -166,8 +206,7 @@ func Post(post models.Post) g.Node {
 			)),
 			g.If(post.Thumbnail == "", h.Span(
 				c.Classes{"bg-teal-300 rounded-full initials inline-flex h-[40px] w-[40px] my-2 shrink-0 items-center justify-center overflow-hidden": true},
-				g.Text("AB"),
-				// g.Text(post.GetInitials),
+				g.Text(post.GetInitials()),
 			)),
 			h.Div(
 				c.Classes{"flex grow": true},
@@ -188,18 +227,18 @@ func Post(post models.Post) g.Node {
 					),
 				),
 				h.Div(
-					c.Classes{"tag-container": true},
+					h.Class("tag-container"),
 					g.Group(g.Map(post.Tags, func(tag string) g.Node {
 						return h.Button(
 							c.Classes{"inline cursor-pointer rounded-md bg-white px-2 font-semibold text-pink-950 transition-colors duration-300 hover:bg-blue-100 hover:text-black my-[2px]": true},
 							g.Text(tag),
 						)
-					}))),
+					})),
+				),
 			),
 			h.Span(
 				c.Classes{"m-2": true},
-				g.Text("69 days ago"),
-				// g.Text(post.TimeSinceCreated),
+				g.Text(post.TimeSinceCreated()),
 			),
 			h.Span(
 				c.Classes{"btn-apply done": true},
@@ -227,6 +266,7 @@ func Post(post models.Post) g.Node {
 						h.ID("htmx"+post.ID),
 						h.Src("/public/images/bars-loader.svg"),
 						h.Height("48"),
+						h.Width("48"),
 					),
 				),
 			),
@@ -336,16 +376,16 @@ func GetPostDetail(w http.ResponseWriter, r *http.Request) {
 
 func PostDetailPage(post *models.Post) g.Node {
 	return h.Section(
-		c.Classes{"my-4": true},
+		h.Class("my-4"),
 		h.Div(
 			c.Classes{"mx-auto max-w-screen-xl": true},
 			h.H3(
 				c.Classes{"text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10": true},
 				g.Text(post.Title),
 			),
-			h.P(
+			h.Article(
 				c.Classes{"mt-4 text-lg leading-7 text-gray-500": true},
-				g.Text(post.Description),
+				g.Raw(post.GetDescription()),
 			),
 		),
 	)

@@ -47,7 +47,8 @@ func main() {
 	r.Handle("GET /about/{$}", readThemeMiddleware(http.HandlerFunc(controllers.GetAbout)))
 	r.Handle("GET /posts/{$}", readThemeMiddleware(http.HandlerFunc(controllers.GetPosts)))
 	r.Handle("GET /posts/details/{id}", readThemeMiddleware(http.HandlerFunc(controllers.GetPostDetail)))
-	// partials.Post("/posts/search/:page", controllers.PostSearchResultsPage)
+	r.Handle("GET /partials/posts/search/{page}", readThemeMiddleware(http.HandlerFunc(controllers.PostSearchResultsPage)))
+	r.Handle("POST /partials/posts/search/{page}", readThemeMiddleware(http.HandlerFunc(controllers.PostSearchResultsPage)))
 
 	PORT := ":8000"
 	if os.Getenv("PORT") != "" {
