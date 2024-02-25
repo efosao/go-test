@@ -14,6 +14,8 @@ import (
 	"gorm.io/gorm/clause"
 )
 
+var tags = []models.Tag{}
+
 func GetHome(w http.ResponseWriter, r *http.Request) {
 	if themeOptions, ok := r.Context().Value(models.ThemeOptionsKey).([]models.ThemeOption); ok {
 		config := &Config{
@@ -78,6 +80,11 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	})(postsChan)
 
 	go (func(t chan []models.Tag) {
+		// tags := []models.Tag{}
+		if len(tags) > 0 {
+			t <- tags
+			return
+		}
 
 		models.DB.Raw(`
 			SELECT unnest(tags) AS name, count(*)::text AS count
