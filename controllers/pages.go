@@ -132,7 +132,6 @@ func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedT
 					h.Multiple(),
 					h.TabIndex("-1"),
 					g.Attr("aria-hidden", "true"),
-					g.Attr("x-init", "window.utils.loadSlimSelect"),
 					g.Group(g.Map(tags, func(tag models.Tag) g.Node {
 						return h.Option(
 							h.Value(tag.Name),

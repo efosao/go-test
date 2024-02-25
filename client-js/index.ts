@@ -3,7 +3,6 @@
 import htmx from "htmx.org";
 import Cookies from "js-cookie";
 import SlimSelect from "../node_modules/slim-select/src/slim-select/index";
-import Alpine from "alpinejs";
 import "./preact";
 
 declare global {
@@ -96,6 +95,12 @@ window.utils = utils;
 function loadEventListeners() {
   console.debug("DOMContentLoaded");
 
+  window.__htmx.onLoad((element: Element) => {
+    if (element.getElementsByClassName("slim-select").length > 0) {
+      utils.loadSlimSelect();
+    }
+  });
+
   const showButton = document.getElementById("dialog_button");
 
   window.addEventListener("click", (e) => {
@@ -127,7 +132,6 @@ function loadEventListeners() {
 }
 
 window.document.addEventListener("DOMContentLoaded", () => {
-  Alpine.start();
   utils.init();
   loadEventListeners();
 });
