@@ -50,7 +50,7 @@ func PostSearchResultsPage(w http.ResponseWriter, r *http.Request) {
 		if page == 0 {
 			w.Header().Set("HX-Push-Url", "/posts")
 		}
-		models.DBConn.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
+		models.DB.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
 
 		if len(posts) == 0 {
 			fmt.Fprintln(w, "")
@@ -62,7 +62,7 @@ func PostSearchResultsPage(w http.ResponseWriter, r *http.Request) {
 		if page == 0 {
 			w.Header().Set("HX-Push-Url", fmt.Sprintf("/posts?tags=%s", selectedTagsStr))
 		}
-		models.DBConn.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
+		models.DB.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
 
 		if len(posts) == 0 {
 			fmt.Fprintln(w, "")

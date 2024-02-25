@@ -1,10 +1,9 @@
 package main
 
 import (
-	"gofiber/controllers"
-	"gofiber/models"
-
+	c "gofiber/controllers"
 	mw "gofiber/middleware"
+	"gofiber/models"
 
 	"fmt"
 	"log"
@@ -21,12 +20,12 @@ func main() {
 	fs := http.FileServer(http.Dir("public"))
 
 	r.Handle("GET /public/", http.StripPrefix("/public/", fs))
-	r.Handle("GET /{$}", mw.ReadThemeMiddleware(http.HandlerFunc(controllers.GetHome)))
-	r.Handle("GET /about/{$}", mw.ReadThemeMiddleware(http.HandlerFunc(controllers.GetAbout)))
-	r.Handle("GET /posts/{$}", mw.ReadThemeMiddleware(http.HandlerFunc(controllers.GetPosts)))
-	r.Handle("GET /posts/details/{id}", mw.ReadThemeMiddleware(http.HandlerFunc(controllers.GetPostDetail)))
-	r.Handle("GET /partials/posts/search/{page}", mw.ReadThemeMiddleware(http.HandlerFunc(controllers.PostSearchResultsPage)))
-	r.Handle("POST /partials/posts/search/{page}", mw.ReadThemeMiddleware(http.HandlerFunc(controllers.PostSearchResultsPage)))
+	r.Handle("GET /{$}", mw.UserTheme(http.HandlerFunc(c.GetHome)))
+	r.Handle("GET /about/{$}", mw.UserTheme(http.HandlerFunc(c.GetAbout)))
+	r.Handle("GET /posts/{$}", mw.UserTheme(http.HandlerFunc(c.GetPosts)))
+	r.Handle("GET /posts/details/{id}", mw.UserTheme(http.HandlerFunc(c.GetPostDetail)))
+	r.Handle("GET /partials/posts/search/{page}", mw.UserTheme(http.HandlerFunc(c.PostSearchResultsPage)))
+	r.Handle("POST /partials/posts/search/{page}", mw.UserTheme(http.HandlerFunc(c.PostSearchResultsPage)))
 
 	PORT := ":8000"
 	if os.Getenv("PORT") != "" {
@@ -34,6 +33,5 @@ func main() {
 	}
 
 	println("Server running on port", PORT)
-
 	log.Fatal(http.ListenAndServe(PORT, handlers.CompressHandler(r)))
 }

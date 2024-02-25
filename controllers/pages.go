@@ -68,18 +68,18 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		posts := []models.Post{}
 		if len(selectedTags) > 0 {
 			queryInputTags := "{" + strings.Join(unescapedSelectedTags, ",") + "}"
-			models.DBConn.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
+			models.DB.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
 			p <- posts
 			return
 		} else {
-			models.DBConn.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
+			models.DB.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
 			p <- posts
 		}
 	})(postsChan)
 
 	go (func(t chan []models.Tag) {
-		tags := []models.Tag{}
-		models.DBConn.Raw(`
+
+		models.DB.Raw(`
 			SELECT unnest(tags) AS name, count(*)::text AS count
 			FROM posts
 			WHERE published_at IS NOT NULL
@@ -357,7 +357,7 @@ func AboutPage(config *Config) g.Node {
 func GetPostDetail(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	post := &models.Post{}
-	if err := models.DBConn.Select("ID", "Title", "Description").Where(&models.Post{ID: id}).First(&post).Error; err != nil {
+	if err := models.DB.Select("ID", "Title", "Description").Where(&models.Post{ID: id}).First(&post).Error; err != nil {
 		if err.Error() == "record not found" {
 			w.WriteHeader(404)
 			w.Write([]byte("Post not found"))

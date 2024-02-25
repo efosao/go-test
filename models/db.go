@@ -8,7 +8,7 @@ import (
 	"github.com/Pacific73/gorm-cache/config"
 )
 
-var DBConn *gorm.DB
+var DB *gorm.DB
 
 func ConnectDB() {
 	dsn := "host=efosa.me user=postgres password=5005227a52c02361b7e95a1f5acfc7f0 dbname=jobs_db port=44553 sslmode=disable TimeZone=America/Los_Angeles"
@@ -38,5 +38,5 @@ func ConnectDB() {
 
 	sqlDB.SetMaxIdleConns(20)
 	sqlDB.SetMaxOpenConns(30)
-	DBConn = conn
+	DB = db
 }
