@@ -325,7 +325,6 @@ func AboutPage(config *Config) g.Node {
 					c.Classes{"rounded-xl p-4 min-w-80 min-h-52 text-black border-2 border-slate-300 relative": true},
 					h.Button(
 						c.Classes{"close absolute right-2 top-1 bg-[transparent!important]": true},
-						g.Attr("onclick", "utils.closeDialog()"),
 						h.Img(h.Src("/public/images/close.svg"), h.Height("32"), h.Width("32")),
 					),
 					h.FormEl(
