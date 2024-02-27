@@ -49,8 +49,11 @@ func HomePage(config *Config) g.Node {
 }
 
 func GetPosts(w http.ResponseWriter, r *http.Request) {
-	selectedTagsStr := r.URL.Query().Get("tags")
-	selectedTags := strings.Split(selectedTagsStr, ",")
+	selectedTagsString := r.URL.Query().Get("tags")
+	var selectedTags []string
+	if selectedTagsString != "" {
+		selectedTags = strings.Split(selectedTagsString, ",")
+	}
 	unescapedSelectedTags := []string{}
 	for _, selectedTag := range selectedTags {
 		escapedTag, err := url.QueryUnescape(selectedTag)
@@ -68,7 +71,8 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 
 	go (func(p chan []models.Post) {
 		posts := []models.Post{}
-		if len(selectedTags) > 0 {
+
+		if len(unescapedSelectedTags) > 0 {
 			queryInputTags := "{" + strings.Join(unescapedSelectedTags, ",") + "}"
 			models.DB.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
 			p <- posts
@@ -80,7 +84,6 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	})(postsChan)
 
 	go (func(t chan []models.Tag) {
-		// tags := []models.Tag{}
 		if len(tags) > 0 {
 			t <- tags
 			return
@@ -118,7 +121,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		themeOptions: r.Context().Value(models.ThemeOptionsKey).([]models.ThemeOption),
 	}
 
-	PostsPage(config, posts, updatedTags, selectedTagsStr, 1).Render(w)
+	PostsPage(config, posts, updatedTags, selectedTagsString, 1).Render(w)
 }
 
 func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedTags string, page int) g.Node {
@@ -293,7 +296,6 @@ func GetAbout(w http.ResponseWriter, r *http.Request) {
 			theme:        r.Context().Value(models.ThemeKey).(string),
 			themeOptions: themeOptions,
 		}
-		fmt.Println("config", config)
 		AboutPage(config).Render(w)
 	} else {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -301,7 +303,7 @@ func GetAbout(w http.ResponseWriter, r *http.Request) {
 }
 
 func AboutPage(config *Config) g.Node {
-	return Layout("About", config,
+	return Layout("About 2.1", config,
 		h.Section(
 			c.Classes{"my-4": true},
 			h.Div(
