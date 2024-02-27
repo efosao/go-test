@@ -4,12 +4,12 @@
   "type": "module",
   "scripts": {
     "dev:css": "tailwindcss -i ./styles/_styles.css -o ./public/dist/stylesheet.css -c ./tailwind.config.ts --watch",
-    "predev": "bun run build:scripts",
-    "dev": "concurrently 'npm:dev:*'",
+    "dev:scripts": "bun build --minify ./client-js/index.ts --outdir ./public/dist --watch",
+    "dev": "concurrently 'bun:dev:*'",
     "build:scripts": "bun build --minify ./client-js/index.ts --outdir ./public/dist",
     "build:scripts:prod": "bun build --minify ./client-js/index.ts --outdir ./public/dist",
     "build:css:prod": "bun tailwindcss -i ./styles/_styles.css -o ./public/dist/stylesheet.css -m",
-    "build": "bun run build:scripts && bun run build:css:prod",
+    "build": "bun run build:scripts:prod && bun run build:css:prod",
     "lint": "bun prettier . --check",
     "lint:fix": "bun prettier . --write"
   },
