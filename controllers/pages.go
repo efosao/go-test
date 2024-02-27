@@ -239,7 +239,8 @@ func Post(post models.Post) g.Node {
 					h.Class("tag-container"),
 					g.Group(g.Map(post.Tags, func(tag string) g.Node {
 						return h.Button(
-							c.Classes{"inline cursor-pointer rounded-md bg-white px-2 font-semibold text-pink-950 transition-colors duration-300 hover:bg-blue-100 hover:text-black my-[2px]": true},
+							g.Attr("onclick", "utils.halt(event)"),
+							c.Classes{"inline cursor-pointer rounded-md bg-white px-2 mr-1 font-semibold text-pink-950 transition-colors duration-300 hover:bg-blue-100 hover:text-black my-[2px]": true},
 							g.Text(tag),
 						)
 					})),
@@ -250,8 +251,11 @@ func Post(post models.Post) g.Node {
 				g.Text(post.TimeSinceCreated()),
 			),
 			h.Span(
-				c.Classes{"btn-apply done": true},
-				g.Text("Applied"),
+				g.Attr("onclick", "utils.halt(event)"),
+				h.Button(
+					c.Classes{"btn-apply done": true},
+					g.Text("Applied"),
+				),
 			),
 		),
 		h.Div(
@@ -303,7 +307,7 @@ func GetAbout(w http.ResponseWriter, r *http.Request) {
 }
 
 func AboutPage(config *Config) g.Node {
-	return Layout("About 2.1", config,
+	return Layout("About 2.2", config,
 		h.Section(
 			c.Classes{"my-4": true},
 			h.Div(
@@ -409,16 +413,20 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 				h.StyleEl(h.Type("text/css"), g.Raw(".is-active{ font-weight: bold }")),
 				h.Link(h.Rel("stylesheet"), h.Href("/public/dist/stylesheet.css")),
 				h.Script(h.Src("/public/dist/index.js"), h.Defer()),
+				h.Meta(h.Name("viewport"), h.Content("width=device-width, initial-scale=1")),
 			),
 			h.Body(
 				c.Classes{"max-w-4xl mx-auto dark:bg-slate-500": true},
 				Navbar(config),
 				h.H1(
-					c.Classes{"text-3xl font-extrabold mb-4 text-black dark:text-black": true},
+					h.Class("text-3xl font-extrabold mb-4 text-black dark:text-black mx-2"),
 					g.Text(title),
 				),
 			),
-			children,
+			h.Div(
+				h.Class("mx-2"),
+				children,
+			),
 		),
 	)
 }
