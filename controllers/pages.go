@@ -420,7 +420,6 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 	return h.Doctype(
 		h.HTML(
 			c.Classes{config.theme: true},
-			hx.Boost("true"),
 			h.Lang("en"),
 			h.Head(
 				h.TitleEl(g.Text(title)),
@@ -430,6 +429,7 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 				h.Meta(h.Name("viewport"), h.Content("width=device-width, initial-scale=1")),
 			),
 			h.Body(
+				hx.Boost("true"),
 				c.Classes{"max-w-4xl mx-auto dark:bg-slate-500": true},
 				Navbar(config),
 				h.H1(
@@ -486,5 +486,12 @@ func Navbar(config *Config) g.Node {
 }
 
 func NavbarLink(href, name, currentPath string) g.Node {
-	return h.A(h.Href(href), c.Classes{"is-active": currentPath == href}, g.Text(name))
+	return h.A(
+		h.Href(href),
+		c.Classes{"is-active": currentPath == href},
+		g.Text(name),
+		hx.Get(href),
+		hx.Trigger("mousedown"),
+		hx.Target("body"),
+	)
 }
