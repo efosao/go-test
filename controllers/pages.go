@@ -5,6 +5,7 @@ import (
 	"gofiber/models"
 	"net/http"
 	"net/url"
+	"runtime/debug"
 	"strings"
 
 	g "github.com/maragudk/gomponents"
@@ -13,6 +14,18 @@ import (
 	h "github.com/maragudk/gomponents/html"
 	"gorm.io/gorm/clause"
 )
+
+var CommitHash = func() string {
+	if info, ok := debug.ReadBuildInfo(); ok {
+		for _, setting := range info.Settings {
+			if setting.Key == "vcs.revision" {
+				return setting.Value
+			}
+		}
+	}
+
+	return ""
+}()
 
 var tags = []models.Tag{}
 
@@ -403,6 +416,7 @@ func PostDetailPage(post *models.Post) g.Node {
 }
 
 func Layout(title string, config *Config, children g.Node) g.Node {
+	releaseHash := fmt.Sprintf("?v=%s", CommitHash)
 	return h.Doctype(
 		h.HTML(
 			c.Classes{config.theme: true},
@@ -411,8 +425,8 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 			h.Head(
 				h.TitleEl(g.Text(title)),
 				h.StyleEl(h.Type("text/css"), g.Raw(".is-active{ font-weight: bold }")),
-				h.Link(h.Rel("stylesheet"), h.Href("/public/dist/stylesheet.css")),
-				h.Script(h.Src("/public/dist/index.js"), h.Defer()),
+				h.Link(h.Rel("stylesheet"), h.Href(fmt.Sprintf("/public/dist/stylesheet.css%s", releaseHash))),
+				h.Script(h.Src(fmt.Sprintf("/public/dist/index.js%s", releaseHash)), h.Defer()),
 				h.Meta(h.Name("viewport"), h.Content("width=device-width, initial-scale=1")),
 			),
 			h.Body(
@@ -422,10 +436,17 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 					h.Class("text-3xl font-extrabold mb-4 text-black dark:text-black mx-2"),
 					g.Text(title),
 				),
-			),
-			h.Div(
-				h.Class("mx-2"),
-				children,
+				h.Div(
+					h.Class("mx-2"),
+					children,
+				),
+				h.Div(
+					h.Class("flex justify-center gap-2 mt-4 mb-2"),
+					h.Span(
+						h.Class("text-xs text-gray-900"),
+						g.Text("Release: "+CommitHash),
+					),
+				),
 			),
 		),
 	)
