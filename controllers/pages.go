@@ -1,11 +1,11 @@
 package controllers
 
 import (
+	_ "embed"
 	"fmt"
 	"gofiber/models"
 	"net/http"
 	"net/url"
-	"runtime/debug"
 	"strings"
 
 	g "github.com/maragudk/gomponents"
@@ -15,17 +15,9 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-var CommitHash = func() string {
-	if info, ok := debug.ReadBuildInfo(); ok {
-		for _, setting := range info.Settings {
-			if setting.Key == "vcs.revision" {
-				return setting.Value
-			}
-		}
-	}
-
-	return ""
-}()
+//go:generate sh -c "printf %s $(git rev-parse HEAD) > commit.txt"
+//go:embed commit.txt
+var CommitHash string
 
 var tags = []models.Tag{}
 
@@ -493,5 +485,6 @@ func NavbarLink(href, name, currentPath string) g.Node {
 		hx.Get(href),
 		hx.Trigger("mousedown"),
 		hx.Target("body"),
+		hx.ReplaceURL("true"),
 	)
 }

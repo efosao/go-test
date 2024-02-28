@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed"
 	c "gofiber/controllers"
 	mw "gofiber/middleware"
 	"gofiber/models"
