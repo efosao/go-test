@@ -23,9 +23,17 @@ var tags = []models.Tag{}
 
 func GetHome(w http.ResponseWriter, r *http.Request) {
 	if themeOptions, ok := r.Context().Value(models.ThemeOptionsKey).([]models.ThemeOption); ok {
+		// cast the theme value to a string
+		// casting is unsafe in Go :(
+		themeValue := r.Context().Value(models.ThemeKey)
+		theme := "light"
+		if themeValue != nil {
+			theme = themeValue.(string)
+		}
+
 		config := &Config{
 			path:         r.URL.Path,
-			theme:        r.Context().Value(models.ThemeKey).(string),
+			theme:        theme,
 			themeOptions: themeOptions,
 		}
 		HomePage(config).Render(w)
