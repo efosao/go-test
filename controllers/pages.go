@@ -419,7 +419,7 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 	releaseHash := fmt.Sprintf("?v=%s", CommitHash)
 	return h.Doctype(
 		h.HTML(
-			c.Classes{config.theme: true},
+			h.Class(config.theme),
 			h.Lang("en"),
 			h.Head(
 				h.TitleEl(g.Text(title)),
