@@ -60,7 +60,7 @@ func PostSearchResultsPage(w http.ResponseWriter, r *http.Request) {
 		Posts(posts, selectedTagsStr, nextPage).Render(w)
 	} else {
 		if page == 0 {
-			w.Header().Set("HX-Push-Url", fmt.Sprintf("/posts?tags=%s", selectedTagsStr))
+			w.Header().Set("HX-Push-Url", fmt.Sprintf("/posts/?tags=%s", selectedTagsStr))
 		}
 		models.DB.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
 
