@@ -331,6 +331,8 @@ func AboutPage(config *Config) g.Node {
 				),
 				g.Raw("<x-greeting count=5></x-greeting>"),
 				g.Raw("<x-greeting count=15></x-greeting>"),
+				g.Raw("<test-rc></test-rc>"),
+				g.Raw("<test-rc cls=\"mt-2\"></test-rc>"),
 			),
 			h.Button(
 				c.Classes{"button": true},

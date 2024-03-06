@@ -27,6 +27,8 @@
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/typography": "^0.5.10",
     "@types/alpinejs": "^3.13.6",
+    "@types/react": "^18.2.63",
+    "@types/react-dom": "^18.2.20",
     "alpinejs": "^3.13.4",
     "autoprefixer": "^10.4.17",
     "concurrently": "^8.2.2",
@@ -38,6 +40,9 @@
     "preact-custom-element": "^4.3.0",
     "prettier": "^3.2.4",
     "prettier-plugin-tailwindcss": "^0.5.11",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-to-webcomponent": "^2.0.0",
     "slim-select": "^2.8.1"
   }
 }
