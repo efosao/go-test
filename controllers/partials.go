@@ -24,9 +24,11 @@ func PostSearchResultsPage(c echo.Context) error {
 	if c.Request().Method == "GET" {
 		selectedTagsStr = c.QueryParams().Get("tags")
 	} else {
-		form := c.Request().Form
-		tags := form["tags"]
-		selectedTagsStr = strings.Join(tags, ",")
+		// TODO: learn this Go pattern
+		if params, err := c.FormParams(); err != nil {
+			tags := params["tags"]
+			selectedTagsStr = strings.Join(tags, ",")
+		}
 	}
 
 	posts := []models.Post{}
