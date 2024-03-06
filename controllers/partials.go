@@ -2,17 +2,17 @@ package controllers
 
 import (
 	"fmt"
-	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"vauntly/models"
 
+	"github.com/labstack/echo/v4"
 	"gorm.io/gorm/clause"
 )
 
-func PostSearchResultsPage(w http.ResponseWriter, r *http.Request) {
-	pageStr := r.PathValue("page")
+func PostSearchResultsPage(c echo.Context) error {
+	pageStr := c.Param("page")
 	page := 0
 	if pageStr != "" {
 		page, _ = strconv.Atoi(pageStr)
@@ -21,11 +21,11 @@ func PostSearchResultsPage(w http.ResponseWriter, r *http.Request) {
 	offset := (nextPage - 1) * 10
 
 	selectedTagsStr := ""
-	if r.Method == "GET" {
-		selectedTagsStr = r.URL.Query().Get("tags")
+	if c.Request().Method == "GET" {
+		selectedTagsStr = c.QueryParams().Get("tags")
 	} else {
-		r.ParseForm()
-		tags := r.Form["tags"]
+		form := c.Request().Form
+		tags := form["tags"]
 		selectedTagsStr = strings.Join(tags, ",")
 	}
 
@@ -44,6 +44,8 @@ func PostSearchResultsPage(w http.ResponseWriter, r *http.Request) {
 
 	queryInputTags := "{" + strings.Join(unescapedSelectedTags, ",") + "}"
 
+	w := c.Response().Writer
+
 	w.Header().Set("Content-Type", "text/html")
 
 	if selectedTagsStr == "" {
@@ -54,7 +56,7 @@ func PostSearchResultsPage(w http.ResponseWriter, r *http.Request) {
 
 		if len(posts) == 0 {
 			fmt.Fprintln(w, "")
-			return
+			return nil
 		}
 
 		Posts(posts, selectedTagsStr, nextPage).Render(w)
@@ -66,9 +68,11 @@ func PostSearchResultsPage(w http.ResponseWriter, r *http.Request) {
 
 		if len(posts) == 0 {
 			fmt.Fprintln(w, "")
-			return
+			return nil
 		}
 
-		Posts(posts, selectedTagsStr, nextPage).Render(w)
+		return Posts(posts, selectedTagsStr, nextPage).Render(c.Response().Writer)
 	}
+
+	return nil
 }

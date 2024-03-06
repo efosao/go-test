@@ -3,11 +3,11 @@ package controllers
 import (
 	_ "embed"
 	"fmt"
-	"net/http"
 	"net/url"
 	"strings"
 	"vauntly/models"
 
+	"github.com/labstack/echo/v4"
 	g "github.com/maragudk/gomponents"
 	hx "github.com/maragudk/gomponents-htmx"
 	c "github.com/maragudk/gomponents/components"
@@ -22,25 +22,33 @@ func SetupCacheHash(hashValue string) {
 	cacheHash = hashValue
 }
 
-func GetHome(w http.ResponseWriter, r *http.Request) {
-	if themeOptions, ok := r.Context().Value(models.ThemeOptionsKey).([]models.ThemeOption); ok {
-		// cast the theme value to a string
-		// casting is unsafe in Go :(
-		themeValue := r.Context().Value(models.ThemeKey)
-		theme := "light"
-		if themeValue != nil {
-			theme = themeValue.(string)
-		}
-
-		config := &Config{
-			path:         r.URL.Path,
-			theme:        theme,
-			themeOptions: themeOptions,
-		}
-		HomePage(config).Render(w)
-	} else {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+func getConfig(c echo.Context) (*Config, error) {
+	themeCookie, err := c.Cookie("theme")
+	if err != nil {
+		return nil, err
 	}
+
+	theme := themeCookie.Value
+	themeOptions := []models.ThemeOption{
+		{Value: "light", Label: "🌞", Selected: theme == "light"},
+		{Value: "dark", Label: "🌘", Selected: theme == "dark"},
+		{Value: "system", Label: "🌎", Selected: theme != "light" && theme != "dark"},
+	}
+
+	config := &Config{
+		path:         c.Request().URL.Path,
+		theme:        theme,
+		themeOptions: themeOptions,
+	}
+	return config, nil
+}
+
+func GetHome(c echo.Context) error {
+	config, error := getConfig(c)
+	if error != nil {
+		return error
+	}
+	return HomePage(config).Render(c.Response().Writer)
 }
 
 func HomePage(config *Config) g.Node {
@@ -62,8 +70,100 @@ func HomePage(config *Config) g.Node {
 	)
 }
 
-func GetPosts(w http.ResponseWriter, r *http.Request) {
-	selectedTagsString := r.URL.Query().Get("tags")
+func GetAbout(c echo.Context) error {
+	config, error := getConfig(c)
+	if error != nil {
+		return error
+	}
+	return AboutPage(config).Render(c.Response().Writer)
+}
+
+func PostAbout(c echo.Context) error {
+	var body struct {
+		Email string `json:"email"`
+		Name  string `json:"name"`
+	}
+
+	body.Email = c.FormValue("email")
+	body.Name = c.FormValue("name")
+	println("Email: ", body.Email)
+	println("Name: ", body.Name)
+
+	return GetAbout(c)
+}
+
+func AboutPage(config *Config) g.Node {
+	return Layout("About 2.2", config,
+		h.Section(
+			h.Class("my-4"),
+			h.Div(
+				h.Class("mx-auto max-w-screen-xl"),
+				h.H3(
+					h.Class("text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10 pointer-events-none"),
+					g.Text("Lit Web-Components === ❤️"),
+				),
+				// g.Raw("<x-greeting count=5></x-greeting>"),
+				// g.Raw("<x-greeting count=15></x-greeting>"),
+				h.Div(
+					h.Class("my-4 flex flex-col gap-2"),
+					g.Raw("<test-rc></test-rc>"),
+					g.Raw("<test-rc></test-rc>"),
+				),
+			),
+			h.Button(
+				c.Classes{"button": true},
+				h.ID("dialog_button"),
+				g.Text("Show test dialog"),
+			),
+			h.Dialog(
+				h.ID("dialog"),
+				c.Classes{"rounded-xl opacity-50 shadow-xl shadow-slate-800 fade-in-bottom overflow-hidden": true},
+				h.Div(
+					c.Classes{"rounded-xl p-4 min-w-80 w-96 min-h-52 text-black border-2 border-slate-300 relative": true},
+					h.Button(
+						c.Classes{"close absolute right-2 top-1 bg-[transparent!important]": true},
+						h.Img(h.Src("/public/images/close.svg"), h.Height("32"), h.Width("32")),
+					),
+					h.FormEl(
+						c.Classes{"flex flex-col gap-2": true},
+						h.Method("post"),
+						h.Div(
+							c.Classes{"mt-8": true},
+							g.Text("This modal dialog has a groovy backdrop!"),
+						),
+						h.Input(
+							h.Type("text"), h.Name("name"), g.Attr("Autofocus"), g.Attr("Autocapitalize"), g.Attr("Autocomplete", "name"), h.Placeholder("Enter your name"), h.Required()),
+						h.Input(h.Type("email"), h.Name("email"), g.Attr("Autocomplete", "email"), h.Placeholder("Enter your email"), h.Required()),
+						h.Div(
+							c.Classes{"flex justify-end gap-2": true},
+							h.Button(
+								c.Classes{"button bg-transparent close": true},
+								h.Type("button"),
+								h.Value("cancel"),
+								g.Attr("formnovalidate", ""),
+								g.Attr("formmethod", "dialog"),
+								g.Text("Cancel"),
+							),
+							h.Button(
+								c.Classes{"button btn-apply": true},
+								h.Type("submit"),
+								g.Text("Submit"),
+							),
+						),
+					),
+				),
+			),
+		),
+	)
+}
+
+func GetPosts(c echo.Context) error {
+	config, error := getConfig(c)
+	if error != nil {
+		return error
+	}
+	// selectedTagsString := r.URL.Query().Get("tags")
+	selectedTagsString := c.QueryParam("tags")
 	var selectedTags []string
 	if selectedTagsString != "" {
 		selectedTags = strings.Split(selectedTagsString, ",")
@@ -129,13 +229,7 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 		updatedTags = append(updatedTags, tag)
 	}
 
-	config := &Config{
-		path:         r.URL.Path,
-		theme:        r.Context().Value(models.ThemeKey).(string),
-		themeOptions: r.Context().Value(models.ThemeOptionsKey).([]models.ThemeOption),
-	}
-
-	PostsPage(config, posts, updatedTags, selectedTagsString, 1).Render(w)
+	return PostsPage(config, posts, updatedTags, selectedTagsString, 1).Render(c.Response().Writer)
 }
 
 func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedTags string, page int) g.Node {
@@ -308,123 +402,21 @@ type Config struct {
 	themeOptions []models.ThemeOption
 }
 
-func GetAbout(w http.ResponseWriter, r *http.Request) {
-	if themeOptions, ok := r.Context().Value(models.ThemeOptionsKey).([]models.ThemeOption); ok {
-		config := &Config{
-			path:         r.URL.Path,
-			theme:        r.Context().Value(models.ThemeKey).(string),
-			themeOptions: themeOptions,
-		}
-		AboutPage(config).Render(w)
-	} else {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-	}
-}
-
-func PostAbout(w http.ResponseWriter, r *http.Request) {
-	var body struct {
-		Email string `json:"email"`
-		Name  string `json:"name"`
-	}
-
-	r.ParseForm()
-	body.Email = r.FormValue("email")
-	body.Name = r.FormValue("name")
-	println("Email: ", body.Email)
-	println("Name: ", body.Name)
-
-	GetAbout(w, r)
-}
-
-func AboutPage(config *Config) g.Node {
-	return Layout("About 2.2", config,
-		h.Section(
-			h.Class("my-4"),
-			h.Div(
-				h.Class("mx-auto max-w-screen-xl"),
-				h.H3(
-					h.Class("text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10 pointer-events-none"),
-					g.Text("Lit Web-Components === ❤️"),
-				),
-				// g.Raw("<x-greeting count=5></x-greeting>"),
-				// g.Raw("<x-greeting count=15></x-greeting>"),
-				h.Div(
-					h.Class("my-4 flex flex-col gap-2"),
-					g.Raw("<test-rc></test-rc>"),
-					g.Raw("<test-rc></test-rc>"),
-				),
-			),
-			h.Button(
-				c.Classes{"button": true},
-				h.ID("dialog_button"),
-				g.Text("Show test dialog"),
-			),
-			h.Dialog(
-				h.ID("dialog"),
-				c.Classes{"rounded-xl opacity-50 shadow-xl shadow-slate-800 fade-in-bottom overflow-hidden": true},
-				h.Div(
-					c.Classes{"rounded-xl p-4 min-w-80 w-96 min-h-52 text-black border-2 border-slate-300 relative": true},
-					h.Button(
-						c.Classes{"close absolute right-2 top-1 bg-[transparent!important]": true},
-						h.Img(h.Src("/public/images/close.svg"), h.Height("32"), h.Width("32")),
-					),
-					h.FormEl(
-						c.Classes{"flex flex-col gap-2": true},
-						h.Method("post"),
-						h.Div(
-							c.Classes{"mt-8": true},
-							g.Text("This modal dialog has a groovy backdrop!"),
-						),
-						h.Input(
-							h.Type("text"), h.Name("name"), g.Attr("Autofocus"), g.Attr("Autocapitalize"), g.Attr("Autocomplete", "name"), h.Placeholder("Enter your name"), h.Required()),
-						h.Input(h.Type("email"), h.Name("email"), g.Attr("Autocomplete", "email"), h.Placeholder("Enter your email"), h.Required()),
-						h.Div(
-							c.Classes{"flex justify-end gap-2": true},
-							h.Button(
-								c.Classes{"button bg-transparent close": true},
-								h.Type("button"),
-								h.Value("cancel"),
-								g.Attr("formnovalidate", ""),
-								g.Attr("formmethod", "dialog"),
-								g.Text("Cancel"),
-							),
-							h.Button(
-								c.Classes{"button btn-apply": true},
-								h.Type("submit"),
-								g.Text("Submit"),
-							),
-						),
-					),
-				),
-			),
-		),
-	)
-}
-
-func GetPostDetail(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
+func GetPostDetail(c echo.Context) error {
+	id := c.Param("id")
 	post := &models.Post{}
 	if err := models.DB.Select("ID", "Title", "Description").Where(&models.Post{ID: id}).First(&post).Error; err != nil {
-		if err.Error() == "record not found" {
-			w.WriteHeader(404)
-			w.Write([]byte("Post not found"))
-		} else {
-			w.WriteHeader(500)
-			w.Write([]byte("Internal Server Error"))
-		}
+		return err
 	}
 
-	w.Header().Set("Content-Type", "text/html")
-	w.WriteHeader(200)
-
-	PostDetailPage(post).Render(w)
+	return PostDetailPage(post).Render(c.Response().Writer)
 }
 
 func PostDetailPage(post *models.Post) g.Node {
 	return h.Section(
 		h.Class("my-4"),
 		h.Div(
-			c.Classes{"mx-auto max-w-screen-xl": true},
+			h.Class("flex flex-col items-center gap-2 max-w-screen-xl"),
 			h.H3(
 				c.Classes{"text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10": true},
 				g.Text(post.Title),
@@ -482,8 +474,8 @@ func Navbar(config *Config) g.Node {
 		h.Div(
 			h.Class("flex items-center relative"),
 			NavbarLink("/", "Home", currentPath),
-			NavbarLink("/about/", "About", currentPath),
-			NavbarLink("/posts/", "Job Posts", currentPath),
+			NavbarLink("/about", "About", currentPath),
+			NavbarLink("/posts", "Job Posts", currentPath),
 			h.Span(
 				h.Class("absolute top-1 left-[260px]"),
 				g.Text("👀"),

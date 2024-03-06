@@ -3,15 +3,11 @@ package main
 import (
 	_ "embed"
 	c "vauntly/controllers"
-	mw "vauntly/middleware"
 	"vauntly/models"
 
-	"fmt"
-	"log"
 	"net/http"
-	"os"
 
-	"github.com/gorilla/handlers"
+	"github.com/labstack/echo/v4"
 )
 
 //go:generate sh -c "printf %s $(git rev-parse HEAD) > hash.txt"
@@ -21,24 +17,20 @@ var cacheHash string
 func main() {
 	models.ConnectDB()
 
-	r := http.NewServeMux()
+	e := echo.New()
 	fs := http.FileServer(http.Dir("public"))
 	c.SetupCacheHash(cacheHash)
 
-	r.Handle("GET /public/", http.StripPrefix("/public/", fs))
-	r.Handle("GET /{$}", mw.UserTheme(http.HandlerFunc(c.GetHome)))
-	r.Handle("GET /about/{$}", mw.UserTheme(http.HandlerFunc(c.GetAbout)))
-	r.Handle("POST /about/{$}", mw.UserTheme(http.HandlerFunc(c.PostAbout)))
-	r.Handle("GET /posts/{$}", mw.UserTheme(http.HandlerFunc(c.GetPosts)))
-	r.Handle("GET /posts/details/{id}", mw.UserTheme(http.HandlerFunc(c.GetPostDetail)))
-	r.Handle("GET /partials/posts/search/{page}", mw.UserTheme(http.HandlerFunc(c.PostSearchResultsPage)))
-	r.Handle("POST /partials/posts/search/{page}", mw.UserTheme(http.HandlerFunc(c.PostSearchResultsPage)))
+	e.GET("/public/*", echo.WrapHandler(http.StripPrefix("/public/", fs)))
+	e.GET("/", c.GetHome)
+	e.GET("/about", c.GetAbout)
+	e.POST("/about", c.PostAbout)
+	e.GET("/posts", c.GetPosts)
+	e.GET("/posts/details/:id", c.GetPostDetail)
+	e.GET("/partials/posts/search/:page", c.PostSearchResultsPage)
+	e.POST("/partials/posts/search/:page", c.PostSearchResultsPage)
 
 	PORT := ":8000"
-	if os.Getenv("PORT") != "" {
-		PORT = fmt.Sprintf(":%s", os.Getenv("PORT"))
-	}
-
 	println("Server running on port", PORT)
-	log.Fatal(http.ListenAndServe(PORT, handlers.CompressHandler(r)))
+	e.Logger.Fatal(e.Start(":3000"))
 }
