@@ -162,7 +162,6 @@ func GetPosts(c echo.Context) error {
 	if error != nil {
 		return error
 	}
-	// selectedTagsString := r.URL.Query().Get("tags")
 	selectedTagsString := c.QueryParam("tags")
 	var selectedTags []string
 	if selectedTagsString != "" {
@@ -245,7 +244,7 @@ func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedT
 					h.Class("slim-select transition-opacity opacity-0"),
 					h.ID("tags"),
 					h.Name("tags"),
-					hx.Post("/partials/posts/search/0"),
+					hx.Post("/partials/posts/search/0/"),
 					hx.Target("#post-list"),
 					hx.Trigger("change"),
 					h.Multiple(),
@@ -379,7 +378,7 @@ func Post(post models.Post) g.Node {
 				h.Class("hidden p-4 peer-checked:flex"),
 				h.Div(
 					h.Class("items-center justify-center"),
-					g.Attr("hx-get", "/posts/details/"+post.ID),
+					g.Attr("hx-get", "/posts/details/"+post.ID+"/"),
 					g.Attr("hx-indicator", "#htmx"+post.ID),
 					g.Attr("hx-swap", "outerHTML transition:true"),
 					g.Attr("hx-trigger", "change"),

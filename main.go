@@ -22,6 +22,12 @@ func main() {
 	models.ConnectDB()
 
 	e := echo.New()
+	e.Use(middleware.AddTrailingSlashWithConfig(middleware.TrailingSlashConfig{
+		RedirectCode: http.StatusMovedPermanently,
+		Skipper: func(c echo.Context) bool {
+			return strings.Contains(c.Path(), "/public")
+		},
+	}))
 	e.Use(middleware.Gzip())
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
 		Format: "${time_rfc3339} ${status} ${method} ${uri} ${latency_human}\n",
@@ -36,12 +42,12 @@ func main() {
 
 	e.GET("/public/*", echo.WrapHandler(http.StripPrefix("/public/", fs)))
 	e.GET("/", c.GetHome)
-	e.GET("/about", c.GetAbout)
-	e.POST("/about", c.PostAbout)
-	e.GET("/posts", c.GetPosts)
-	e.GET("/posts/details/:id", c.GetPostDetail)
-	e.GET("/partials/posts/search/:page", c.PostSearchResultsPage)
-	e.POST("/partials/posts/search/:page", c.PostSearchResultsPage)
+	e.GET("/about/", c.GetAbout)
+	e.POST("/about/", c.PostAbout)
+	e.GET("/posts/", c.GetPosts)
+	e.GET("/posts/details/:id/", c.GetPostDetail)
+	e.GET("/partials/posts/search/:page/", c.PostSearchResultsPage)
+	e.POST("/partials/posts/search/:page/", c.PostSearchResultsPage)
 
 	PORT := ":8000"
 	if os.Getenv("PORT") != "" {
