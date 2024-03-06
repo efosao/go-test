@@ -228,7 +228,7 @@ func GetPosts(c echo.Context) error {
 		updatedTags = append(updatedTags, tag)
 	}
 
-	return PostsPage(config, posts, updatedTags, selectedTagsString, 1).Render(c.Response().Writer)
+	return PostsPage(config, posts, updatedTags, selectedTagsString, 0).Render(c.Response().Writer)
 }
 
 func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedTags string, page int) g.Node {
