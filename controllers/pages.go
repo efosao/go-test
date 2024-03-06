@@ -147,7 +147,7 @@ func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedT
 			h.Div(
 				h.Class("h-10"),
 				h.Select(
-					c.Classes{"hidden slim-select": true},
+					h.Class("slim-select transition-opacity opacity-0"),
 					h.ID("tags"),
 					h.Name("tags"),
 					hx.Post("/partials/posts/search/0"),
@@ -425,6 +425,7 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 	releaseHash := fmt.Sprintf("?v=%s", cacheHash)
 	return h.Doctype(
 		h.HTML(
+			h.Class("smooth-scroll"),
 			h.Class(config.theme),
 			h.Lang("en"),
 			h.Head(
@@ -461,20 +462,28 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 func Navbar(config *Config) g.Node {
 	currentPath := config.path
 	return h.Nav(
-		c.Classes{"m-2 text-xl flex justify-between": true},
+		c.Classes{"text-xl flex justify-between": true},
 		h.Div(
-			c.Classes{"flex gap-2": true},
+			h.Class("flex items-center relative"),
 			NavbarLink("/", "Home", currentPath),
 			NavbarLink("/about/", "About", currentPath),
 			NavbarLink("/posts/", "Job Posts", currentPath),
-			g.Text("👀"),
+			h.Span(
+				h.Class("absolute top-1 left-[260px]"),
+				g.Text("👀"),
+			),
 		),
 		h.FormEl(
 			c.Classes{"select-none": true},
 			g.Attr("onchange", "utils.setTheme(event)"),
 			h.Label(
 				c.Classes{"flex items-center": true},
-				h.Span(c.Classes{"text-slate-900 dark:text-slate-900": true}, g.Text("theme")),
+				h.Span(
+					h.Class("sr-only"),
+					h.Span(
+						g.Text("theme"),
+					),
+				),
 				h.Select(
 					c.Classes{"ml-2 border-none dark:bg-slate-400": true},
 					h.Name("themepicker"),
@@ -494,7 +503,10 @@ func Navbar(config *Config) g.Node {
 func NavbarLink(href, name, currentPath string) g.Node {
 	return h.A(
 		h.Href(href),
-		c.Classes{"is-active": currentPath == href},
+		c.Classes{
+			"p-2":       true,
+			"is-active": currentPath == href,
+		},
 		g.Text(name),
 	)
 }

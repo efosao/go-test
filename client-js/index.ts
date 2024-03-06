@@ -65,23 +65,32 @@ const utils = {
   },
 
   loadSlimSelect: () => {
-    setTimeout(() => {
-      for (const select of document.getElementsByClassName("slim-select")) {
-        /* @ts-ignore */
-        if (typeof select.slim !== "undefined") {
-          return;
-        }
-        select.classList.remove("hide");
-        new SlimSelect({
-          select: select as HTMLSelectElement,
-          settings: {
-            isMultiple: true,
-            maxSelected: 5,
-            searchHighlight: true
-          }
-        });
+    for (const select of document.getElementsByClassName("slim-select")) {
+      /* @ts-ignore */
+      if (typeof select.slim !== "undefined") {
+        return;
       }
-    }, 50);
+
+      new SlimSelect({
+        select: select as HTMLSelectElement,
+        settings: {
+          isMultiple: true,
+          maxSelected: 5,
+          searchHighlight: true
+        }
+      });
+
+      select.animate([{
+        opacity: 0
+      }, {
+        opacity: 1
+      }], {
+        delay: 0,
+        duration: 350,
+        easing: "ease-in-out",
+        fill: "forwards"
+      });
+    }
   }
 };
 
