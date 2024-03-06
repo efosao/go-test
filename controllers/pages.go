@@ -143,6 +143,7 @@ func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedT
 
 	return Layout("Posts", config,
 		h.Section(
+			hx.History("false"), // disable htmx caching for this page
 			h.Class("my-4"),
 			h.Div(
 				h.Class("h-10"),
@@ -321,7 +322,6 @@ func GetAbout(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostAbout(w http.ResponseWriter, r *http.Request) {
-	// body is formdata with email and name
 	var body struct {
 		Email string `json:"email"`
 		Name  string `json:"name"`
@@ -452,7 +452,6 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 				h.Meta(h.Name("viewport"), h.Content("width=device-width, initial-scale=1")),
 			),
 			h.Body(
-				hx.Boost("true"),
 				h.Class("max-w-4xl mx-auto dark:bg-slate-400"),
 				Navbar(config),
 				h.H1(
@@ -478,6 +477,7 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 func Navbar(config *Config) g.Node {
 	currentPath := config.path
 	return h.Nav(
+		hx.Boost("true"),
 		c.Classes{"text-xl flex justify-between": true},
 		h.Div(
 			h.Class("flex items-center relative"),
