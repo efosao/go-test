@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "embed"
+	"strings"
 	c "vauntly/controllers"
 	"vauntly/models"
 
@@ -20,6 +21,14 @@ func main() {
 
 	e := echo.New()
 	e.Use(middleware.Gzip())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "${time_rfc3339} ${status} ${method} ${uri} ${latency_human}\n",
+		Skipper: func(c echo.Context) bool {
+			return strings.Contains(c.Path(), "/public")
+		},
+	}))
+	e.Use(middleware.Recover())
+
 	fs := http.FileServer(http.Dir("public"))
 	c.SetupCacheHash(cacheHash)
 
