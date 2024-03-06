@@ -15,8 +15,8 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-//go:generate sh -c "printf %s $(git rev-parse HEAD) > commit.txt"
-//go:embed commit.txt
+//go:generate sh -c "printf %s $(git rev-parse HEAD) > hash.txt"
+//go:embed hash.txt
 var CommitHash string
 
 var tags = []models.Tag{}

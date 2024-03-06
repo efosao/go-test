@@ -1,0 +1,12 @@
+#!/bin/sh
+# Run go generate to generate any code that depends on other files
+go generate ./...
+# Check if there are any errors
+if [ $? -ne 0 ]; then
+  echo "go generate failed, aborting commit 😭"
+  exit 1
+fi
+# Add commit.txt file to the commit
+git add controllers/hash.txt
+# Proceed with the commit
+exit 0

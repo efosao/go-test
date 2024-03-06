@@ -20,7 +20,6 @@ COPY tsconfig.json .
 COPY . .
 
 RUN bun run build
-# RUN go generate
 RUN go build -o ./tmp/main .
 
 EXPOSE 80
