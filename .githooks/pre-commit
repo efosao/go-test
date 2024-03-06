@@ -7,6 +7,6 @@ if [ $? -ne 0 ]; then
   exit 1
 fi
 # Add commit.txt file to the commit
-git add controllers/hash.txt
+git add hash.txt
 # Proceed with the commit
 exit 0

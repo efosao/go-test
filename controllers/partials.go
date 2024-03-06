@@ -2,11 +2,11 @@ package controllers
 
 import (
 	"fmt"
-	"gofiber/models"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
+	"vauntly/models"
 
 	"gorm.io/gorm/clause"
 )

@@ -2,9 +2,9 @@ package main
 
 import (
 	_ "embed"
-	c "gofiber/controllers"
-	mw "gofiber/middleware"
-	"gofiber/models"
+	c "vauntly/controllers"
+	mw "vauntly/middleware"
+	"vauntly/models"
 
 	"fmt"
 	"log"
@@ -14,11 +14,16 @@ import (
 	"github.com/gorilla/handlers"
 )
 
+//go:generate sh -c "printf %s $(git rev-parse HEAD) > hash.txt"
+//go:embed hash.txt
+var cacheHash string
+
 func main() {
 	models.ConnectDB()
 
 	r := http.NewServeMux()
 	fs := http.FileServer(http.Dir("public"))
+	c.SetupCacheHash(cacheHash)
 
 	r.Handle("GET /public/", http.StripPrefix("/public/", fs))
 	r.Handle("GET /{$}", mw.UserTheme(http.HandlerFunc(c.GetHome)))

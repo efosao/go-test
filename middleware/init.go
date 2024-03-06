@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"context"
-	"gofiber/models"
 	"net/http"
+	"vauntly/models"
 )
 
 func UserTheme(next http.Handler) http.Handler {

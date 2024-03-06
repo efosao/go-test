@@ -1,4 +1,4 @@
-module gofiber
+module vauntly
 
 go 1.22.0
 

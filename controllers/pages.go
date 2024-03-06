@@ -3,10 +3,10 @@ package controllers
 import (
 	_ "embed"
 	"fmt"
-	"gofiber/models"
 	"net/http"
 	"net/url"
 	"strings"
+	"vauntly/models"
 
 	g "github.com/maragudk/gomponents"
 	hx "github.com/maragudk/gomponents-htmx"
@@ -15,11 +15,12 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-//go:generate sh -c "printf %s $(git rev-parse HEAD) > hash.txt"
-//go:embed hash.txt
-var CommitHash string
-
 var tags = []models.Tag{}
+var cacheHash = ""
+
+func SetupCacheHash(hashValue string) {
+	cacheHash = hashValue
+}
 
 func GetHome(w http.ResponseWriter, r *http.Request) {
 	if themeOptions, ok := r.Context().Value(models.ThemeOptionsKey).([]models.ThemeOption); ok {
@@ -418,7 +419,7 @@ func PostDetailPage(post *models.Post) g.Node {
 }
 
 func Layout(title string, config *Config, children g.Node) g.Node {
-	releaseHash := fmt.Sprintf("?v=%s", CommitHash)
+	releaseHash := fmt.Sprintf("?v=%s", cacheHash)
 	return h.Doctype(
 		h.HTML(
 			h.Class(config.theme),
@@ -446,7 +447,7 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 					h.Class("flex justify-center gap-2 mt-4 mb-2"),
 					h.Span(
 						h.Class("text-xs text-gray-900"),
-						g.Text("Release: "+CommitHash),
+						g.Text("Release: "+cacheHash),
 					),
 				),
 			),
