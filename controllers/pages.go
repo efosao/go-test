@@ -23,12 +23,12 @@ func SetupCacheHash(hashValue string) {
 }
 
 func getConfig(c echo.Context) (*Config, error) {
-	themeCookie, err := c.Cookie("theme")
-	if err != nil {
-		return nil, err
+	themeCookie, _ := c.Cookie("theme")
+	theme := "system"
+	if themeCookie != nil {
+		theme = themeCookie.Value
 	}
 
-	theme := themeCookie.Value
 	themeOptions := []models.ThemeOption{
 		{Value: "light", Label: "🌞", Selected: theme == "light"},
 		{Value: "dark", Label: "🌘", Selected: theme == "dark"},
