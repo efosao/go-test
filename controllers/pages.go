@@ -496,9 +496,5 @@ func NavbarLink(href, name, currentPath string) g.Node {
 		h.Href(href),
 		c.Classes{"is-active": currentPath == href},
 		g.Text(name),
-		hx.Get(href),
-		hx.Trigger("mousedown"),
-		hx.Target("body"),
-		hx.ReplaceURL("true"),
 	)
 }
