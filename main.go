@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 //go:generate sh -c "printf %s $(git rev-parse HEAD) > hash.txt"
@@ -18,6 +19,7 @@ func main() {
 	models.ConnectDB()
 
 	e := echo.New()
+	e.Use(middleware.Gzip())
 	fs := http.FileServer(http.Dir("public"))
 	c.SetupCacheHash(cacheHash)
 
