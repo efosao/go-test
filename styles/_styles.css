@@ -197,7 +197,7 @@ input[type="checkbox"],
 select,
 button,
 textarea {
-  @apply rounded dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:placeholder-gray-500 dark:hover:border-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200 dark:hover:placeholder-gray-500 dark:focus:border-gray-700 dark:focus:ring-0 dark:focus:ring-gray-700 dark:focus:ring-opacity-50 dark:hover:focus:border-gray-700 dark:hover:focus:ring-0 dark:hover:focus:ring-gray-700 dark:hover:focus:ring-opacity-50;
+  @apply rounded dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200 dark:placeholder-gray-500 dark:hover:border-slate-400 dark:hover:bg-slate-400 dark:hover:text-gray-200 dark:hover:placeholder-gray-500 dark:focus:border-gray-700 dark:focus:ring-0 dark:focus:ring-gray-700 dark:focus:ring-opacity-50 dark:hover:focus:border-gray-700 dark:hover:focus:ring-0 dark:hover:focus:ring-gray-700 dark:hover:focus:ring-opacity-50;
   border-radius: 0.25rem;
 }
 
@@ -235,11 +235,11 @@ nav > a.cta {
 h1,
 h2,
 h3 {
-  @apply text-gray-700 dark:text-gray-200;
+  @apply text-gray-700 dark:text-white;
 }
 
 p {
-  @apply text-gray-600 dark:text-gray-300;
+  @apply text-gray-600 dark:text-white;
 }
 
 li.step {

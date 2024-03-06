@@ -323,17 +323,20 @@ func GetAbout(w http.ResponseWriter, r *http.Request) {
 func AboutPage(config *Config) g.Node {
 	return Layout("About 2.2", config,
 		h.Section(
-			c.Classes{"my-4": true},
+			h.Class("my-4"),
 			h.Div(
-				c.Classes{"mx-auto max-w-screen-xl": true},
+				h.Class("mx-auto max-w-screen-xl"),
 				h.H3(
-					c.Classes{"text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10": true},
+					h.Class("text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10"),
 					g.Text("Lit Web-Components === ❤️"),
 				),
-				g.Raw("<x-greeting count=5></x-greeting>"),
-				g.Raw("<x-greeting count=15></x-greeting>"),
-				g.Raw("<test-rc></test-rc>"),
-				g.Raw("<test-rc cls=\"mt-2\"></test-rc>"),
+				// g.Raw("<x-greeting count=5></x-greeting>"),
+				// g.Raw("<x-greeting count=15></x-greeting>"),
+				h.Div(
+					h.Class("my-4 flex flex-col gap-2"),
+					g.Raw("<test-rc></test-rc>"),
+					g.Raw("<test-rc></test-rc>"),
+				),
 			),
 			h.Button(
 				c.Classes{"button": true},
@@ -433,7 +436,7 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 			),
 			h.Body(
 				hx.Boost("true"),
-				c.Classes{"max-w-4xl mx-auto dark:bg-slate-500": true},
+				h.Class("max-w-4xl mx-auto dark:bg-slate-400"),
 				Navbar(config),
 				h.H1(
 					h.Class("text-3xl font-extrabold mb-4 text-black dark:text-black mx-2"),
@@ -473,7 +476,7 @@ func Navbar(config *Config) g.Node {
 				c.Classes{"flex items-center": true},
 				h.Span(c.Classes{"text-slate-900 dark:text-slate-900": true}, g.Text("theme")),
 				h.Select(
-					c.Classes{"ml-2 border-none dark:bg-slate-500": true},
+					c.Classes{"ml-2 border-none dark:bg-slate-400": true},
 					h.Name("themepicker"),
 					g.Group(g.Map(config.themeOptions, func(option models.ThemeOption) g.Node {
 						return h.Option(
