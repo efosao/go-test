@@ -6,7 +6,9 @@ import (
 	c "vauntly/controllers"
 	"vauntly/models"
 
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -42,6 +44,10 @@ func main() {
 	e.POST("/partials/posts/search/:page", c.PostSearchResultsPage)
 
 	PORT := ":8000"
+	if os.Getenv("PORT") != "" {
+		PORT = fmt.Sprintf(":%s", os.Getenv("PORT"))
+	}
+
 	println("Server running on port", PORT)
-	e.Logger.Fatal(e.Start(":3000"))
+	e.Logger.Fatal(e.Start(PORT))
 }
