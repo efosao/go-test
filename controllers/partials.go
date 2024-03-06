@@ -26,6 +26,8 @@ func PostSearchResultsPage(c echo.Context) error {
 	} else {
 		// TODO: learn this Go pattern
 		if params, err := c.FormParams(); err != nil {
+			fmt.Println("Error parsing form params", err)
+		} else {
 			tags := params["tags"]
 			selectedTagsStr = strings.Join(tags, ",")
 		}
