@@ -18,14 +18,26 @@ import (
 //go:embed hash.txt
 var cacheHash string
 
+func customHTTPErrorHandler(err error, c echo.Context) {
+	code := http.StatusInternalServerError
+	if he, ok := err.(*echo.HTTPError); ok {
+		code = he.Code
+	}
+	c.Logger().Error(err)
+	errorPage := fmt.Sprintf("%d.html", code)
+	if err := c.File(errorPage); err != nil {
+		c.Logger().Error(err)
+	}
+}
+
 func main() {
 	models.ConnectDB()
 
 	e := echo.New()
-	e.Use(middleware.AddTrailingSlashWithConfig(middleware.TrailingSlashConfig{
-		RedirectCode: http.StatusMovedPermanently,
-		Skipper: func(c echo.Context) bool {
-			return strings.Contains(c.Path(), "/public")
+	e.Pre(middleware.RewriteWithConfig(middleware.RewriteConfig{
+		Rules: map[string]string{
+			"*/":   "$1",
+			"*/?*": "$1?$2",
 		},
 	}))
 	e.Use(middleware.Gzip())
@@ -40,14 +52,16 @@ func main() {
 	fs := http.FileServer(http.Dir("public"))
 	c.SetupCacheHash(cacheHash)
 
+	e.HTTPErrorHandler = customHTTPErrorHandler
+
 	e.GET("/public/*", echo.WrapHandler(http.StripPrefix("/public/", fs)))
 	e.GET("/", c.GetHome)
-	e.GET("/about/", c.GetAbout)
-	e.POST("/about/", c.PostAbout)
-	e.GET("/posts/", c.GetPosts)
-	e.GET("/posts/details/:id/", c.GetPostDetail)
-	e.GET("/partials/posts/search/:page/", c.PostSearchResultsPage)
-	e.POST("/partials/posts/search/:page/", c.PostSearchResultsPage)
+	e.GET("/about", c.GetAbout)
+	e.POST("/about", c.PostAbout)
+	e.GET("/posts", c.GetPosts)
+	e.GET("/posts/details/:id", c.GetPostDetail)
+	e.GET("/partials/posts/search/:page", c.PostSearchResultsPage)
+	e.POST("/partials/posts/search/:page", c.PostSearchResultsPage)
 
 	PORT := ":8000"
 	if os.Getenv("PORT") != "" {
