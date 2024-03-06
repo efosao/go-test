@@ -28,6 +28,7 @@ func main() {
 	r.Handle("GET /public/", http.StripPrefix("/public/", fs))
 	r.Handle("GET /{$}", mw.UserTheme(http.HandlerFunc(c.GetHome)))
 	r.Handle("GET /about/{$}", mw.UserTheme(http.HandlerFunc(c.GetAbout)))
+	r.Handle("POST /about/{$}", mw.UserTheme(http.HandlerFunc(c.PostAbout)))
 	r.Handle("GET /posts/{$}", mw.UserTheme(http.HandlerFunc(c.GetPosts)))
 	r.Handle("GET /posts/details/{id}", mw.UserTheme(http.HandlerFunc(c.GetPostDetail)))
 	r.Handle("GET /partials/posts/search/{page}", mw.UserTheme(http.HandlerFunc(c.PostSearchResultsPage)))

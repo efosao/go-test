@@ -50,7 +50,7 @@ func HomePage(config *Config) g.Node {
 			h.Div(
 				c.Classes{"mx-auto max-w-screen-xl": true},
 				h.H3(
-					c.Classes{"text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10": true},
+					h.Class("text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10 pointer-events-none"),
 					g.Text("Welcome to the job board"),
 				),
 				h.P(
@@ -320,6 +320,22 @@ func GetAbout(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func PostAbout(w http.ResponseWriter, r *http.Request) {
+	// body is formdata with email and name
+	var body struct {
+		Email string `json:"email"`
+		Name  string `json:"name"`
+	}
+
+	r.ParseForm()
+	body.Email = r.FormValue("email")
+	body.Name = r.FormValue("name")
+	println("Email: ", body.Email)
+	println("Name: ", body.Name)
+
+	GetAbout(w, r)
+}
+
 func AboutPage(config *Config) g.Node {
 	return Layout("About 2.2", config,
 		h.Section(
@@ -327,7 +343,7 @@ func AboutPage(config *Config) g.Node {
 			h.Div(
 				h.Class("mx-auto max-w-screen-xl"),
 				h.H3(
-					h.Class("text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10"),
+					h.Class("text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10 pointer-events-none"),
 					g.Text("Lit Web-Components === ❤️"),
 				),
 				// g.Raw("<x-greeting count=5></x-greeting>"),
@@ -347,7 +363,7 @@ func AboutPage(config *Config) g.Node {
 				h.ID("dialog"),
 				c.Classes{"rounded-xl opacity-50 shadow-xl shadow-slate-800 fade-in-bottom overflow-hidden": true},
 				h.Div(
-					c.Classes{"rounded-xl p-4 min-w-80 min-h-52 text-black border-2 border-slate-300 relative": true},
+					c.Classes{"rounded-xl p-4 min-w-80 w-96 min-h-52 text-black border-2 border-slate-300 relative": true},
 					h.Button(
 						c.Classes{"close absolute right-2 top-1 bg-[transparent!important]": true},
 						h.Img(h.Src("/public/images/close.svg"), h.Height("32"), h.Width("32")),
@@ -440,7 +456,7 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 				h.Class("max-w-4xl mx-auto dark:bg-slate-400"),
 				Navbar(config),
 				h.H1(
-					h.Class("text-3xl font-extrabold mb-4 text-black dark:text-black mx-2"),
+					h.Class("text-3xl font-extrabold mb-4 text-black dark:text-black mx-2 pointer-events-none"),
 					g.Text(title),
 				),
 				h.Div(
