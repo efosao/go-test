@@ -2,7 +2,6 @@ import React from 'react';
 import r2wc from "react-to-webcomponent"
 import ReactDOM from "react-dom/client";
 import Select from 'react-select';
-import htmx from 'htmx.org';
 
 console.log("Initializing React");
 
@@ -43,9 +42,8 @@ const ReactSelect = ({ options }: { options: string }) => {
             defaultValue={selectedOptions}
             isMulti
             onChange={selectedOptions => {
-                console.table(selectedOptions, ['value'])
                 const taggy = document.querySelector("#taggy")
-                // const htmx = window.__htmx;
+                const htmx = window.__htmx;
                 if (!taggy) return;
                 // hx-post="/partials/posts/search/0/"
                 // hx-target="#post-list"
