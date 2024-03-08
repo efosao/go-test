@@ -1,6 +1,7 @@
 import React from 'react';
 import r2wc from "react-to-webcomponent"
 import ReactDOM from "react-dom/client";
+import Select from 'react-select';
 
 console.log("Initializing React");
 
@@ -19,4 +20,44 @@ const TestReactComponentWC = r2wc(TestReactComponent, React, ReactDOM, {
 });
 
 customElements.define("test-rc", TestReactComponentWC);
+
+type Option = {
+    label: string;
+    value: string;
+}
+
+const ReactSelect = ({ options }: { options: string }) => {
+    let optsArray: Option[] = []
+    
+    try {
+        optsArray = JSON.parse(options);
+    } catch (error) {
+        console.log({ error })
+    }
+    const selectedOptions = optsArray.slice(0, 3)
+
+    return (
+        <Select
+            defaultValue={selectedOptions}
+            isMulti
+            onChange={selectedOptions => {
+                console.info("selected options")
+                console.table(selectedOptions, ['value'])
+            }}
+            name="colors"
+            options={optsArray}
+            className="basic-multi-select"
+            classNamePrefix="select"
+        />
+    )};
+
+
+const ReactSelectWC = r2wc(ReactSelect, React, ReactDOM, {
+    props: {
+        options: "string"
+    },
+});
+
+customElements.define("react-select", ReactSelectWC);
+
 

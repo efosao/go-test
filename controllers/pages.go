@@ -2,6 +2,7 @@ package controllers
 
 import (
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	"net/url"
 	"strings"
@@ -93,6 +94,35 @@ func PostAbout(c echo.Context) error {
 }
 
 func AboutPage(config *Config) g.Node {
+	type Option struct {
+		Label string `json:"label"`
+		Value string `json:"value"`
+	}
+
+	models.DB.Raw(`
+		SELECT unnest(tags) AS name, count(*)::text AS count
+		FROM posts
+		WHERE published_at IS NOT NULL
+		GROUP by name
+		ORDER BY count(*) DESC;
+	`).Scan(&tags)
+
+	options := make([]Option, len(tags))
+
+	for index, element := range tags {
+		options[index] = Option{
+			Label: element.Name,
+			Value: element.Name,
+		}
+	}
+
+	tagStr := ""
+	if tagsBytes, err := json.Marshal(options); err == nil {
+		tagStr = string(tagsBytes)
+	} else {
+		fmt.Println(err)
+	}
+
 	return Layout("About 2.2", config,
 		h.Section(
 			h.Class("my-4"),
@@ -100,7 +130,7 @@ func AboutPage(config *Config) g.Node {
 				h.Class("mx-auto max-w-screen-xl"),
 				h.H3(
 					h.Class("text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:text-4xl sm:leading-10 pointer-events-none"),
-					g.Text("Lit Web-Components === ❤️"),
+					g.Text("Lit Web-Components === ❤️❤️❤️"),
 				),
 				// g.Raw("<x-greeting count=5></x-greeting>"),
 				// g.Raw("<x-greeting count=15></x-greeting>"),
@@ -108,6 +138,7 @@ func AboutPage(config *Config) g.Node {
 					h.Class("my-4 flex flex-col gap-2"),
 					g.Raw("<test-rc></test-rc>"),
 					g.Raw("<test-rc></test-rc>"),
+					g.Raw("<react-select options='"+tagStr+"'></react-select>"),
 				),
 			),
 			h.Button(
