@@ -45,10 +45,6 @@ const ReactSelect = ({ options }: { options: string }) => {
                 const taggy = document.querySelector("#taggy")
                 const htmx = window.__htmx;
                 if (!taggy) return;
-                // hx-post="/partials/posts/search/0/"
-                // hx-target="#post-list"
-                // hx-trigger="change"
-                // hx-swap="outerHtml"
                 htmx.ajax("POST", "/partials/posts/search/0/", {
                     values: {
                         tags: selectedOptions.map(o => o.value).join(","),
