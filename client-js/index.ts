@@ -2,7 +2,7 @@
 /// <reference lib="dom.iterable" />
 import htmx from "htmx.org";
 import Cookies from "js-cookie";
-import SlimSelect from "../node_modules/slim-select/src/slim-select/index";
+// import SlimSelect from "../node_modules/slim-select/src/slim-select/index";
 // import "./preact";
 import "./react"
 
@@ -64,34 +64,34 @@ const utils = {
     utils.configureDefaultTheme();
   },
 
-  loadSlimSelect: () => {
-    for (const select of document.getElementsByClassName("slim-select")) {
-      /* @ts-ignore */
-      if (typeof select.slim !== "undefined") {
-        return;
-      }
+  // loadSlimSelect: () => {
+  //   for (const select of document.getElementsByClassName("slim-select")) {
+  //     /* @ts-ignore */
+  //     if (typeof select.slim !== "undefined") {
+  //       return;
+  //     }
 
-      new SlimSelect({
-        select: select as HTMLSelectElement,
-        settings: {
-          isMultiple: true,
-          maxSelected: 5,
-          searchHighlight: true
-        }
-      });
+  //     new SlimSelect({
+  //       select: select as HTMLSelectElement,
+  //       settings: {
+  //         isMultiple: true,
+  //         maxSelected: 5,
+  //         searchHighlight: true
+  //       }
+  //     });
 
-      select.animate([{
-        opacity: 0
-      }, {
-        opacity: 1
-      }], {
-        delay: 0,
-        duration: 350,
-        easing: "ease-in-out",
-        fill: "forwards"
-      });
-    }
-  }
+  //     select.animate([{
+  //       opacity: 0
+  //     }, {
+  //       opacity: 1
+  //     }], {
+  //       delay: 0,
+  //       duration: 350,
+  //       easing: "ease-in-out",
+  //       fill: "forwards"
+  //     });
+  //   }
+  // }
 };
 
 window
@@ -105,11 +105,11 @@ window.utils = utils;
 function loadEventListeners() {
   console.debug("DOMContentLoaded");
 
-  window.__htmx.onLoad((element: Element) => {
-    if (element.getElementsByClassName("slim-select").length > 0) {
-      utils.loadSlimSelect();
-    }
-  });
+  // window.__htmx.onLoad((element: Element) => {
+  //   if (element.getElementsByClassName("slim-select").length > 0) {
+  //     utils.loadSlimSelect();
+  //   }
+  // });
 
   const showButton = document.getElementById("dialog_button");
 

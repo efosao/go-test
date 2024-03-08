@@ -94,11 +94,6 @@ func PostAbout(c echo.Context) error {
 }
 
 func AboutPage(config *Config) g.Node {
-	type Option struct {
-		Label string `json:"label"`
-		Value string `json:"value"`
-	}
-
 	models.DB.Raw(`
 		SELECT unnest(tags) AS name, count(*)::text AS count
 		FROM posts
@@ -106,6 +101,11 @@ func AboutPage(config *Config) g.Node {
 		GROUP by name
 		ORDER BY count(*) DESC;
 	`).Scan(&tags)
+
+	type Option struct {
+		Label string `json:"label"`
+		Value string `json:"value"`
+	}
 
 	options := make([]Option, len(tags))
 
@@ -138,7 +138,18 @@ func AboutPage(config *Config) g.Node {
 					h.Class("my-4 flex flex-col gap-2"),
 					g.Raw("<test-rc></test-rc>"),
 					g.Raw("<test-rc></test-rc>"),
-					g.Raw("<react-select options='"+tagStr+"'></react-select>"),
+					g.Raw(`<react-select
+						id="taggy"
+						options='`+tagStr+`'
+						hx-post="/partials/posts/search/0/"
+						hx-target="#post-list"
+						hx-trigger="change"
+						hx-swap="outerHtml"
+						></react-select>`),
+				),
+				h.Div(
+					h.ID("post-list"),
+					h.Class("mt-4 border rounded-md p-4"),
 				),
 			),
 			h.Button(
@@ -265,30 +276,42 @@ func GetPosts(c echo.Context) error {
 func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedTags string, page int) g.Node {
 	nextPage := page + 1
 
+	type Option struct {
+		Label    string `json:"label"`
+		Value    string `json:"value"`
+		Selected bool   `json:"selected"`
+	}
+
+	options := make([]Option, len(tags))
+
+	for index, element := range tags {
+		options[index] = Option{
+			Label:    element.Name,
+			Value:    element.Name,
+			Selected: element.Selected,
+		}
+	}
+
+	tagStr := ""
+	if tagsBytes, err := json.Marshal(options); err == nil {
+		tagStr = string(tagsBytes)
+	} else {
+		fmt.Println(err)
+	}
+
 	return Layout("Posts", config,
 		h.Section(
 			hx.History("false"), // disable htmx caching for this page
-			h.Class("my-4"),
+			h.Class("my-2"),
 			h.Div(
-				h.Class("h-10"),
-				h.Select(
-					h.Class("slim-select transition-opacity opacity-0"),
-					h.ID("tags"),
-					h.Name("tags"),
-					hx.Post("/partials/posts/search/0/"),
-					hx.Target("#post-list"),
-					hx.Trigger("change"),
-					h.Multiple(),
-					h.TabIndex("-1"),
-					g.Attr("aria-hidden", "true"),
-					g.Group(g.Map(tags, func(tag models.Tag) g.Node {
-						return h.Option(
-							h.Value(tag.Name),
-							g.If(tag.Selected, h.Selected()),
-							g.Text(tag.Name),
-						)
-					})),
-				),
+				g.Raw(`<react-select
+						id="taggy"
+						options='`+tagStr+`'
+						hx-post="/partials/posts/search/0/"
+						hx-target="#post-list"
+						hx-trigger="change"
+						hx-swap="outerHtml"
+						></react-select>`),
 			),
 			h.Div(
 				Posts(posts, selectedTags, nextPage),

@@ -2,6 +2,7 @@ import React from 'react';
 import r2wc from "react-to-webcomponent"
 import ReactDOM from "react-dom/client";
 import Select from 'react-select';
+import htmx from 'htmx.org';
 
 console.log("Initializing React");
 
@@ -24,6 +25,7 @@ customElements.define("test-rc", TestReactComponentWC);
 type Option = {
     label: string;
     value: string;
+    selected: boolean;
 }
 
 const ReactSelect = ({ options }: { options: string }) => {
@@ -34,15 +36,29 @@ const ReactSelect = ({ options }: { options: string }) => {
     } catch (error) {
         console.log({ error })
     }
-    const selectedOptions = optsArray.slice(0, 3)
+    const selectedOptions = optsArray.filter(o => o.selected)
 
     return (
         <Select
             defaultValue={selectedOptions}
             isMulti
             onChange={selectedOptions => {
-                console.info("selected options")
                 console.table(selectedOptions, ['value'])
+                const taggy = document.querySelector("#taggy")
+                // const htmx = window.__htmx;
+                if (!taggy) return;
+                // hx-post="/partials/posts/search/0/"
+                // hx-target="#post-list"
+                // hx-trigger="change"
+                // hx-swap="outerHtml"
+                htmx.ajax("POST", "/partials/posts/search/0/", {
+                    values: {
+                        tags: selectedOptions.map(o => o.value).join(","),
+                    },
+                    target: "#post-list",
+                    swap: "outerHTML",
+                });
+
             }}
             name="colors"
             options={optsArray}
