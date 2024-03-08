@@ -304,6 +304,7 @@ func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedT
 			hx.History("false"), // disable htmx caching for this page
 			h.Class("my-2"),
 			h.Div(
+				h.Class("h-9"),
 				g.Raw(`<react-select
 						id="taggy"
 						options='`+tagStr+`'
