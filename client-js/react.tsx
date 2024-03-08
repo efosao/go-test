@@ -1,7 +1,8 @@
+import htmx from "htmx.org";
 import React from 'react';
-import r2wc from "react-to-webcomponent"
 import ReactDOM from "react-dom/client";
 import Select from 'react-select';
+import r2wc from "react-to-webcomponent"
 
 console.log("Initializing React");
 
@@ -33,7 +34,7 @@ const ReactSelect = ({ options }: { options: string }) => {
     try {
         optsArray = JSON.parse(options);
     } catch (error) {
-        console.log({ error })
+        console.error("Error parsing options", error);
     }
     const selectedOptions = optsArray.filter(o => o.selected)
 
@@ -43,7 +44,6 @@ const ReactSelect = ({ options }: { options: string }) => {
             isMulti
             onChange={selectedOptions => {
                 const taggy = document.querySelector("#taggy")
-                const htmx = window.__htmx;
                 if (!taggy) return;
                 htmx.ajax("POST", "/partials/posts/search/0/", {
                     values: {
