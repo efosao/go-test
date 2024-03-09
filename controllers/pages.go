@@ -138,14 +138,7 @@ func AboutPage(config *Config) g.Node {
 					h.Class("my-4 flex flex-col gap-2"),
 					g.Raw("<test-rc></test-rc>"),
 					g.Raw("<test-rc></test-rc>"),
-					g.Raw(`<react-select
-						id="taggy"
-						options='`+tagStr+`'
-						hx-post="/partials/posts/search/0/"
-						hx-target="#post-list"
-						hx-trigger="change"
-						hx-swap="outerHtml"
-						></react-select>`),
+					g.Raw(fmt.Sprintf("<react-select options='%s'></react-select>", tagStr)),
 				),
 				h.Div(
 					h.ID("post-list"),
@@ -302,20 +295,16 @@ func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedT
 	return Layout("Posts", config,
 		h.Section(
 			hx.History("false"), // disable htmx caching for this page
-			h.Class("my-2"),
 			h.Div(
 				h.Class("h-9"),
-				g.Raw(`<react-select
-						id="taggy"
-						options='`+tagStr+`'
-						hx-post="/partials/posts/search/0/"
-						hx-target="#post-list"
-						hx-trigger="change"
-						hx-swap="outerHtml"
-						></react-select>`),
+				g.Raw(fmt.Sprintf("<react-select options='%s'></react-select>", tagStr)),
 			),
 			h.Div(
-				Posts(posts, selectedTags, nextPage),
+				h.ID("post-list"),
+				h.Class("mt-4"),
+				h.Div(
+					Posts(posts, selectedTags, nextPage),
+				),
 			),
 		),
 	)
@@ -328,8 +317,6 @@ func Posts(posts []models.Post, selectedTags string, nextPage int) g.Node {
 	}
 
 	return h.Div(
-		h.ID("post-list"),
-		h.Class("mt-4"),
 		g.Group(g.Map(posts, func(post models.Post) g.Node {
 			return Post(post)
 		})),
@@ -362,9 +349,9 @@ func Posts(posts []models.Post, selectedTags string, nextPage int) g.Node {
 }
 
 func Post(post models.Post) g.Node {
-	class := "search_row group relative mb-2 rounded-md border-0 border-pink-200 bg-pink-100 dark:border-prussian-blue-900 dark:bg-black dark:text-white"
+	class := "search_row w-full group relative mb-2 rounded-md border-0 border-pink-200 bg-pink-100 dark:border-prussian-blue-900 dark:bg-slate-700 dark:text-white"
 	if post.IsPinned() {
-		class = "search_row group relative mb-2 rounded-md border-0 border-orange-200 bg-orange-200 text-black dark:border-slate-700 dark:bg-slate-700 dark:text-white"
+		class = "search_row group relative mb-2 rounded-md border-0 border-orange-200 bg-orange-200 text-black dark:border-slate-700 dark:bg-pink-700 dark:text-white"
 	}
 
 	return h.Div(
@@ -487,8 +474,7 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 	releaseHash := fmt.Sprintf("?v=%s", cacheHash)
 	return h.Doctype(
 		h.HTML(
-			h.Class("smooth-scroll"),
-			h.Class(config.theme),
+			h.Class("smooth-scroll "+config.theme),
 			h.Lang("en"),
 			h.Head(
 				h.TitleEl(g.Text(title)),
@@ -503,6 +489,7 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 			),
 			h.Body(
 				h.Class("max-w-4xl mx-auto dark:bg-slate-400"),
+				g.Raw("<app-bar><div class='h-10 bg-black rounded-nd'></div></app-bar>"),
 				Navbar(config),
 				h.H1(
 					h.Class("text-3xl font-extrabold mb-4 text-black dark:text-black mx-2 pointer-events-none"),
