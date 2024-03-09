@@ -24,6 +24,8 @@
   },
   "dependencies": {
     "@lit-labs/preact-signals": "^1.0.2",
+    "@r2wc/react-to-web-component": "^2.0.3",
+    "@radix-ui/react-menubar": "^1.0.4",
     "@tailwindcss/forms": "^0.5.7",
     "@tailwindcss/line-clamp": "^0.4.4",
     "@tailwindcss/typography": "^0.5.10",
@@ -32,10 +34,12 @@
     "@types/react-dom": "^18.2.20",
     "alpinejs": "^3.13.4",
     "autoprefixer": "^10.4.17",
+    "clsx": "^2.1.0",
     "concurrently": "^8.2.2",
     "htmx.org": "^1.9.10",
     "js-cookie": "^3.0.5",
     "lit": "^3.1.2",
+    "lucide-react": "^0.352.0",
     "postcss-import": "^16.0.0",
     "preact": "^10.19.3",
     "preact-custom-element": "^4.3.0",
@@ -45,6 +49,7 @@
     "react-dom": "^18.2.0",
     "react-select": "^5.8.0",
     "react-to-webcomponent": "^2.0.0",
-    "slim-select": "^2.8.1"
+    "tailwind-merge": "^2.2.1",
+    "tailwindcss-animate": "^1.0.7"
   }
 }

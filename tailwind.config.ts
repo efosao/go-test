@@ -1,13 +1,29 @@
 /** @type {import('tailwindcss').Config} */
 const defaultTheme = require("tailwindcss/defaultTheme");
 
-module.exports = {
-  content: ["./**/*.ts", "./**/*.tsx", "./**/controllers/*.go"],
-  darkMode: "class",
+const config = {
+  darkMode: ["class"],
+  content: [
+    "./**/*.ts",
+    "./**/*.tsx",
+    "./**/controllers/*.go",
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
+  prefix: "",
   theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
     extend: {
       fontFamily: {
-        sans: ["libre_baskerville", ...defaultTheme.fontFamily.sans]
+        sans: ["libre_baskerville", ...defaultTheme.fontFamily.sans],
       },
       colors: {
         "eastern-blue": {
@@ -21,7 +37,7 @@ module.exports = {
           700: "#1f657f",
           800: "#215569",
           900: "#204659",
-          950: "#102e3c"
+          950: "#102e3c",
         },
         "mountain-meadow": {
           50: "#edfcf3",
@@ -34,7 +50,7 @@ module.exports = {
           700: "#0e6e46",
           800: "#0e5739",
           900: "#0c4830",
-          950: "#06281b"
+          950: "#06281b",
         },
         blue: {
           50: "#effaff",
@@ -47,7 +63,7 @@ module.exports = {
           700: "#0079af",
           800: "#006690",
           900: "#035477",
-          950: "#023047"
+          950: "#023047",
         },
         "prussian-blue": {
           50: "#effaff",
@@ -60,7 +76,7 @@ module.exports = {
           700: "#0079af",
           800: "#006690",
           900: "#035477",
-          950: "#023047"
+          950: "#023047",
         },
         "flush-orange": {
           50: "#fffbec",
@@ -73,10 +89,26 @@ module.exports = {
           700: "#cc6302",
           800: "#a14c0b",
           900: "#82400c",
-          950: "#461e04"
-        }
-      }
-    }
+          950: "#461e04",
+        },
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+    },
   },
-  plugins: [require("@tailwindcss/forms"), require("@tailwindcss/typography")]
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 };
+
+export default config;
