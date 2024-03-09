@@ -496,6 +496,10 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 				h.Link(h.Rel("stylesheet"), h.Href(fmt.Sprintf("/public/dist/stylesheet.css%s", releaseHash))),
 				h.Script(h.Src(fmt.Sprintf("/public/dist/index.js%s", releaseHash)), h.Defer()),
 				h.Meta(h.Name("viewport"), h.Content("width=device-width, initial-scale=1")),
+				g.Raw(`<link rel="apple-touch-icon" sizes="180x180" href="/public/apple-touch-icon.png">`),
+				g.Raw(`<link rel="icon" type="image/png" sizes="32x32" href="/public/favicon-32x32.png">`),
+				g.Raw(`<link rel="icon" type="image/png" sizes="16x16" href="/public/favicon-16x16.png">`),
+				h.Link(h.Rel("manifest"), h.Href("/public/site.webmanifest")),
 			),
 			h.Body(
 				h.Class("max-w-4xl mx-auto dark:bg-slate-400"),
