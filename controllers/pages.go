@@ -23,6 +23,19 @@ func SetupCacheHash(hashValue string) {
 	cacheHash = hashValue
 }
 
+func LoadTags() []models.Tag {
+	if len(tags) == 0 {
+		models.DB.Raw(`
+			SELECT unnest(tags) AS name, count(*)::text AS count
+			FROM posts
+			WHERE published_at IS NOT NULL
+			GROUP by name
+			ORDER BY count(*) DESC;
+		`).Scan(&tags)
+	}
+	return tags
+}
+
 func getConfig(c echo.Context) (*Config, error) {
 	themeCookie, _ := c.Cookie("theme")
 	theme := "system"
@@ -94,13 +107,7 @@ func PostAbout(c echo.Context) error {
 }
 
 func AboutPage(config *Config) g.Node {
-	models.DB.Raw(`
-		SELECT unnest(tags) AS name, count(*)::text AS count
-		FROM posts
-		WHERE published_at IS NOT NULL
-		GROUP by name
-		ORDER BY count(*) DESC;
-	`).Scan(&tags)
+	LoadTags()
 
 	type Option struct {
 		Label string `json:"label"`
@@ -232,19 +239,7 @@ func GetPosts(c echo.Context) error {
 	})(postsChan)
 
 	go (func(t chan []models.Tag) {
-		if len(tags) > 0 {
-			t <- tags
-			return
-		}
-
-		models.DB.Raw(`
-			SELECT unnest(tags) AS name, count(*)::text AS count
-			FROM posts
-			WHERE published_at IS NOT NULL
-			GROUP by name
-			ORDER BY count(*) DESC;
-		`).Scan(&tags)
-		t <- tags
+		t <- LoadTags()
 	})(tagsChan)
 
 	posts := <-postsChan
