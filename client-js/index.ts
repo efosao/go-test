@@ -118,8 +118,8 @@ window.document.addEventListener("DOMContentLoaded", () => {
   if (pgTitle) {
     pgTitle.animate(
       [
-        { opacity: 0, transform: "translateX(40px)" },
-        { opacity: 0.5, transform: "translateX(-5px)" },
+        { opacity: 0, transform: "translateX(100px)" },
+        { opacity: 0.5, transform: "translateX(-20px)" },
         { opacity: 1, transform: "translateX(0)" },
       ],
       {
