@@ -20,7 +20,11 @@ var tags = []models.Tag{}
 var cacheHash = ""
 
 func SetupCacheHash(hashValue string) {
-	cacheHash = hashValue
+	if len(hashValue) < 8 {
+		cacheHash = hashValue
+		return
+	}
+	cacheHash = hashValue[0:8]
 }
 
 func LoadTags() []models.Tag {
@@ -504,8 +508,12 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 				h.Div(
 					h.Class("flex justify-center gap-2 mt-4 mb-2"),
 					h.Span(
-						h.Class("text-xs text-gray-900"),
-						g.Text("Release: "+cacheHash),
+						h.Class("text-md font-bold text-gray-900 bg-slate-300 p-2 rounded-md"),
+						g.Text("Release"),
+						h.Span(
+							h.Class("text-md font-bold text-gray-700 p-1 ml-2 bg-slate-400 rounded-md"),
+							g.Text(cacheHash),
+						),
 					),
 				),
 			),
