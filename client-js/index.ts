@@ -16,6 +16,10 @@ window.__htmx = htmx;
 
 const ENABLE_HTMX_DEBUG = process.env.NODE_ENV !== "production" && false;
 
+const selectors = {
+  pgTitle: "page-title",
+};
+
 const utils = {
   halt: (e: Event) => {
     e.preventDefault();
@@ -106,6 +110,29 @@ function loadEventListeners() {
 }
 
 window.document.addEventListener("DOMContentLoaded", () => {
+  console.debug("DOMContentLoaded");
+  const pgTitle = document.getElementById(selectors.pgTitle);
+  pgTitle?.style.setProperty("opacity", "0");
+
+  // Animate the page title
+  if (pgTitle) {
+    pgTitle.animate(
+      [
+        { opacity: 0, transform: "translateX(40px)" },
+        { opacity: 0.5, transform: "translateX(-5px)" },
+        { opacity: 1, transform: "translateX(0)" },
+      ],
+      {
+        delay: 200,
+        duration: 350,
+        fill: "forwards",
+        easing: "ease-in",
+      }
+    );
+  } else {
+    console.error("pgTitle not found");
+  }
+
   utils.init();
   loadEventListeners();
 });

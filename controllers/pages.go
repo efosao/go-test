@@ -490,7 +490,8 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 					g.Raw("<app-bar><div class='h-10 bg-black rounded-nd'></div></app-bar>"),
 				),
 				h.H1(
-					h.Class("container mt-8 mx-auto max-w-5xl text-3xl font-extrabold mb-4 text-black dark:text-black pointer-events-none"),
+					h.ID("page-title"),
+					h.Class("container mx-auto max-w-5xl text-3xl font-extrabold mb-4 text-black dark:text-black pointer-events-none"),
 					g.Text(title),
 				),
 				h.Div(
