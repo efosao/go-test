@@ -128,7 +128,10 @@ window.document.addEventListener("DOMContentLoaded", () => {
         fill: "forwards",
         easing: "ease-in",
       }
-    );
+    ).onfinish = () => {
+      console.debug("Animation finished");
+      pgTitle.style.removeProperty("opacity");
+    };
   } else {
     console.error("pgTitle not found");
   }
