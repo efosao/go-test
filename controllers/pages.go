@@ -487,11 +487,14 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 				Navbar(config),
 				h.Div(
 					h.Class("bg-slate-600 h-14 p-2"),
-					g.Raw("<app-bar><div class='h-10 bg-black rounded-nd'></div></app-bar>"),
+					h.Div(
+						h.Class("mx-auto max-w-7xl"),
+						g.Raw("<app-bar><div class='h-10 bg-black rounded-md'></div></app-bar>"),
+					),
 				),
 				h.H1(
 					h.ID("page-title"),
-					h.Class("container mx-auto max-w-5xl text-3xl font-extrabold mb-4 text-black dark:text-black pointer-events-none"),
+					h.Class("container mx-auto my-4 max-w-5xl text-3xl font-extrabold text-black dark:text-black pointer-events-none"),
 					g.Text(title),
 				),
 				h.Div(
