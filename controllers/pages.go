@@ -487,7 +487,7 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 				h.Link(h.Rel("manifest"), h.Href("/public/site.webmanifest")),
 			),
 			h.Body(
-				h.Class("dark:bg-slate-400"),
+				h.Class("flex flex-col min-h-screen dark:bg-slate-400"),
 				Navbar(config),
 				h.Div(
 					h.Class("bg-slate-600 h-14 p-2"),
@@ -502,14 +502,14 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 					g.Text(title),
 				),
 				h.Div(
-					h.Class("container mx-auto max-w-5xl"),
+					h.Class("flex-grow container mx-auto max-w-5xl"),
 					children,
 				),
-				h.Div(
+				h.Footer(
 					h.Class("flex justify-center gap-2 mt-4 mb-2"),
 					h.Span(
 						h.Class("text-md font-bold text-gray-900 bg-slate-300 p-2 rounded-md"),
-						g.Text("Release"),
+						g.Text("Release:"),
 						h.Span(
 							h.Class("text-md font-bold text-gray-700 p-1 ml-2 bg-slate-400 rounded-md"),
 							g.Text(cacheHash),
