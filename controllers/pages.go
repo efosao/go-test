@@ -66,7 +66,61 @@ func GetHome(c echo.Context) error {
 	if error != nil {
 		return error
 	}
-	return HomePage(config).Render(c.Response().Writer)
+	selectedTagsString := c.QueryParam("tags")
+	var selectedTags []string
+	if selectedTagsString != "" {
+		selectedTags = strings.Split(selectedTagsString, ",")
+	}
+	unescapedSelectedTags := []string{}
+	for _, selectedTag := range selectedTags {
+		escapedTag, err := url.QueryUnescape(selectedTag)
+		if err == nil {
+			// This is a hack to fix the fact that the "c++" tag is not being unescaped properly
+			if escapedTag == "c  " {
+				escapedTag = strings.ReplaceAll(escapedTag, " ", "+")
+			}
+			unescapedSelectedTags = append(unescapedSelectedTags, escapedTag)
+		}
+	}
+
+	postsChan := make(chan []models.Post)
+	tagsChan := make(chan []models.Tag)
+
+	go (func(p chan []models.Post) {
+		posts := []models.Post{}
+
+		if len(unescapedSelectedTags) > 0 {
+			queryInputTags := "{" + strings.Join(unescapedSelectedTags, ",") + "}"
+			models.DB.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
+			p <- posts
+			return
+		} else {
+			models.DB.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Limit(10).Find(&posts)
+			p <- posts
+		}
+	})(postsChan)
+
+	go (func(t chan []models.Tag) {
+		t <- LoadTags()
+	})(tagsChan)
+
+	posts := <-postsChan
+	tags := <-tagsChan
+
+	selectedTagMap := map[string]bool{}
+	for _, selectedTag := range selectedTags {
+		selectedTagMap[selectedTag] = true
+	}
+
+	updatedTags := []models.Tag{}
+	for _, tag := range tags {
+		if selectedTagMap[tag.Name] {
+			tag.Selected = true
+		}
+		updatedTags = append(updatedTags, tag)
+	}
+
+	return PostsPage(config, posts, updatedTags, selectedTagsString, 0, "").Render(c.Response().Writer)
 }
 
 func HomePage(config *Config) g.Node {
@@ -262,10 +316,10 @@ func GetPosts(c echo.Context) error {
 		updatedTags = append(updatedTags, tag)
 	}
 
-	return PostsPage(config, posts, updatedTags, selectedTagsString, 0).Render(c.Response().Writer)
+	return PostsPage(config, posts, updatedTags, selectedTagsString, 0, "Posts").Render(c.Response().Writer)
 }
 
-func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedTags string, page int) g.Node {
+func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedTags string, page int, title string) g.Node {
 	nextPage := page + 1
 
 	type Option struct {
@@ -291,7 +345,7 @@ func PostsPage(config *Config, posts []models.Post, tags []models.Tag, selectedT
 		fmt.Println(err)
 	}
 
-	return Layout("Posts", config,
+	return Layout(title, config,
 		h.Section(
 			hx.History("false"), // disable htmx caching for this page
 			h.Div(
@@ -488,6 +542,7 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 			),
 			h.Body(
 				h.Class("flex flex-col min-h-screen dark:bg-slate-400"),
+				hx.Boost("true"),
 				Navbar(config),
 				h.Div(
 					h.Class("bg-slate-600 h-14 p-2"),
@@ -555,7 +610,6 @@ func Navbar(config *Config) g.Node {
         </div>
     </nav>`),
 		h.Nav(
-			hx.Boost("true"),
 			c.Classes{"text-xl hidden justify-between": true},
 			h.Div(
 				h.Class("flex items-center relative"),

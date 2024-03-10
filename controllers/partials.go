@@ -52,9 +52,14 @@ func PostSearchResultsPage(c echo.Context) error {
 
 	w.Header().Set("Content-Type", "text/html")
 
+	host := c.Request().Header.Get("Referer")
+	if strings.Contains(host, "?") {
+		host = host[:strings.Index(host, "?")]
+	}
+
 	if selectedTagsStr == "" {
 		if page == 0 {
-			w.Header().Set("HX-Push-Url", "/posts")
+			w.Header().Set("HX-Push-Url", host)
 		}
 		models.DB.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
 
@@ -66,7 +71,7 @@ func PostSearchResultsPage(c echo.Context) error {
 		Posts(posts, selectedTagsStr, nextPage).Render(w)
 	} else {
 		if page == 0 {
-			w.Header().Set("HX-Push-Url", fmt.Sprintf("/posts?tags=%s", selectedTagsStr))
+			w.Header().Set("HX-Push-Url", fmt.Sprintf(host+"?tags=%s", selectedTagsStr))
 		}
 		models.DB.Select("ID", "CompanyName", "Location", "Tags", "Thumbnail", "Title", "PublishedAt", "CreatedAt").Where("tags @> ?", queryInputTags).Where("published_at IS NOT NULL").Order(clause.OrderByColumn{Column: clause.Column{Name: "published_at"}, Desc: true}).Offset(offset).Limit(10).Find(&posts)
 
