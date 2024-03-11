@@ -551,13 +551,13 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 						g.Raw("<app-bar><div class='h-10 bg-black rounded-md'></div></app-bar>"),
 					),
 				),
-				h.H1(
-					h.ID("page-title"),
-					h.Class("container mx-auto my-4 max-w-5xl text-3xl font-extrabold text-black dark:text-black pointer-events-none"),
-					g.Text(title),
-				),
 				h.Div(
-					h.Class("flex-grow container mx-auto max-w-5xl"),
+					h.Class("flex-grow w-full mx-auto max-w-7xl"),
+					h.H1(
+						h.ID("page-title"),
+						h.Class("my-4 overflow-hidden max-w-7xl text-3xl font-extrabold text-black dark:text-black"),
+						g.Text(title),
+					),
 					children,
 				),
 				h.Footer(
