@@ -143,9 +143,9 @@ window.document.addEventListener("DOMContentLoaded", () => {
   loadEventListeners();
 });
 
-htmx.onLoad(function (content) {
+htmx.onLoad(function (e) {
   console.debug("htmx.onLoad");
-  animatePageTitle();
+  if (e.id === "page-content") animatePageTitle();
   loadEventListeners();
 });
 
