@@ -2,7 +2,9 @@ package main
 
 import (
 	_ "embed"
+	"log"
 	"strings"
+	"time"
 	c "vauntly/controllers"
 	"vauntly/models"
 
@@ -39,6 +41,14 @@ func main() {
 			"*/":   "$1",
 			"*/?*": "$1?$2",
 		},
+	}))
+	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
+		Skipper:      middleware.DefaultSkipper,
+		ErrorMessage: "custom timeout error message returns to client",
+		OnTimeoutRouteErrorHandler: func(err error, c echo.Context) {
+			log.Println(c.Path())
+		},
+		Timeout: 20 * time.Second,
 	}))
 	e.Use(middleware.Gzip())
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
