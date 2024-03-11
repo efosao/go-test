@@ -552,7 +552,8 @@ func Layout(title string, config *Config, children g.Node) g.Node {
 					),
 				),
 				h.Div(
-					h.Class("flex-grow w-full mx-auto max-w-7xl"),
+					h.Class("flex-grow w-full p-2 mx-auto max-w-7xl"),
+					h.ID("page-content"),
 					h.H1(
 						h.ID("page-title"),
 						h.Class("my-4 overflow-hidden max-w-7xl text-3xl font-extrabold text-black dark:text-black"),
