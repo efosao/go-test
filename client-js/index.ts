@@ -112,28 +112,7 @@ function loadEventListeners() {
 function animatePageTitle() {
   const pgTitle = document.getElementById(selectors.pgTitle);
   pgTitle?.style.setProperty("opacity", "0");
-
-  // Animate the page title
-  if (pgTitle) {
-    pgTitle.animate(
-      [
-        { opacity: 0, transform: "translateX(50px)" },
-        { opacity: 0.5, transform: "translateX(-20px)" },
-        { opacity: 1, transform: "translateX(0)" },
-      ],
-      {
-        delay: 200,
-        duration: 350,
-        fill: "forwards",
-        easing: "ease-in",
-      }
-    ).onfinish = () => {
-      console.debug("Animation finished");
-      pgTitle.style.removeProperty("opacity");
-    };
-  } else {
-    console.error("pgTitle not found");
-  }
+  pgTitle?.classList.add("fade-in-bottom");
 }
 
 window.document.addEventListener("DOMContentLoaded", () => {

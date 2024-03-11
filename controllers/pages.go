@@ -120,7 +120,7 @@ func GetHome(c echo.Context) error {
 		updatedTags = append(updatedTags, tag)
 	}
 
-	return PostsPage(config, posts, updatedTags, selectedTagsString, 0, "").Render(c.Response().Writer)
+	return PostsPage(config, posts, updatedTags, selectedTagsString, 0, "Search the best TECH Jobs today >>").Render(c.Response().Writer)
 }
 
 func HomePage(config *Config) g.Node {
