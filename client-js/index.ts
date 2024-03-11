@@ -109,8 +109,7 @@ function loadEventListeners() {
   });
 }
 
-window.document.addEventListener("DOMContentLoaded", () => {
-  console.debug("DOMContentLoaded");
+function animatePageTitle() {
   const pgTitle = document.getElementById(selectors.pgTitle);
   pgTitle?.style.setProperty("opacity", "0");
 
@@ -135,13 +134,18 @@ window.document.addEventListener("DOMContentLoaded", () => {
   } else {
     console.error("pgTitle not found");
   }
+}
 
+window.document.addEventListener("DOMContentLoaded", () => {
+  console.debug("DOMContentLoaded");
+  animatePageTitle();
   utils.init();
   loadEventListeners();
 });
 
 htmx.onLoad(function (content) {
   console.debug("htmx.onLoad");
+  animatePageTitle();
   loadEventListeners();
 });
 
