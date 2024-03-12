@@ -34,15 +34,60 @@ const utils = {
     Cookies.set("tz", tz);
   },
 
-  configureDefaultTheme: () => {
+  isCurrentThemeDark: () => {
     const theme = Cookies.get("theme") || "system";
     let isDark =
       theme === "system"
         ? window.matchMedia("(prefers-color-scheme: dark)").matches
         : theme === "dark";
+    return isDark;
+  },
 
-    if (isDark) document.getElementsByTagName("html")[0].classList.add("dark");
-    else document.getElementsByTagName("html")[0].classList.remove("dark");
+  configureDefaultTheme: () => {
+    const darkToggleId = "dark-mode-toggle";
+    const lightToggleId = "light-mode-toggle";
+
+    const darkToggle = document.getElementById(darkToggleId);
+    const lightToggle = document.getElementById(lightToggleId);
+
+    function transitionToggles(
+      outElement: HTMLElement,
+      inElement: HTMLElement
+    ) {
+      outElement.animate(
+        [
+          { opacity: 1, transform: "rotate(0deg)" },
+          { opacity: 0, transform: "rotate(360deg)" },
+        ],
+        { duration: 300, fill: "forwards", easing: "ease-in-out" }
+      );
+      inElement.classList.remove("hidden");
+      inElement.animate(
+        [
+          { opacity: 0, transform: "rotate(0deg)" },
+          { opacity: 1, transform: "rotate(360deg)" },
+        ],
+        {
+          duration: 300,
+          fill: "forwards",
+        }
+      );
+    }
+
+    if (!darkToggle || !lightToggle) return;
+
+    if (utils.isCurrentThemeDark()) {
+      document.getElementsByTagName("html")[0].classList.add("dark");
+      transitionToggles(darkToggle, lightToggle);
+    } else {
+      document.getElementsByTagName("html")[0].classList.remove("dark");
+      transitionToggles(lightToggle, darkToggle);
+    }
+  },
+
+  toggleCurrentTheme: () => {
+    const newTheme = utils.isCurrentThemeDark() ? "light" : "dark";
+    utils.setTheme({ target: { value: newTheme } });
   },
 
   toggleOpenState: (checkboxId: string, descriptionId: string) => {
