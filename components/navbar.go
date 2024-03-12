@@ -33,9 +33,9 @@ func Navbar(config *models.Config) g.Node {
 					h.ID("mobile-menu-2"),
 					h.Ul(
 						h.Class("flex font-medium flex-row gap-4"),
-						NavLink("/", "Home", currentPath),
-						NavLink("/about", "About", currentPath),
-						NavLink("/posts", "Job Posts", currentPath),
+						NavLink("/", "Home", currentPath, "hidden md:flex"),
+						NavLink("/about", "About", currentPath, ""),
+						NavLink("/posts", "Job Posts", currentPath, ""),
 					),
 				),
 				h.Div(
@@ -91,7 +91,7 @@ func Navbar(config *models.Config) g.Node {
 	)
 }
 
-func NavLink(href, name, currentPath string) g.Node {
+func NavLink(href, name, currentPath string, classes string) g.Node {
 	return h.Li(
 		h.A(
 			h.Href(href),
@@ -99,6 +99,7 @@ func NavLink(href, name, currentPath string) g.Node {
 				"block p-2 border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700": true,
 				"text-gray-500 dark:text-gray-400": currentPath != href,
 				"text-gray-900 dark:text-gray-200": currentPath == href,
+				classes:                            true,
 			},
 			h.Aria("current", "page"),
 			g.Text(name),
