@@ -7,6 +7,7 @@ import (
 	"time"
 	c "vauntly/controllers"
 	"vauntly/models"
+	"vauntly/utils"
 
 	"fmt"
 	"net/http"
@@ -60,12 +61,12 @@ func main() {
 	e.Use(middleware.Recover())
 
 	fs := http.FileServer(http.Dir("public"))
-	c.SetupCacheHash(cacheHash)
+	utils.SetupCacheHash(cacheHash)
 
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
 	e.GET("/public/*", echo.WrapHandler(http.StripPrefix("/public/", fs)))
-	e.GET("/", c.GetHome)
+	e.GET("/", c.Home)
 	e.GET("/about", c.GetAbout)
 	e.POST("/about", c.PostAbout)
 	e.GET("/posts", c.GetPosts)

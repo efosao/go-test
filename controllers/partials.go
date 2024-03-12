@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"vauntly/components"
 	"vauntly/models"
 
 	"github.com/labstack/echo/v4"
@@ -68,7 +69,7 @@ func PostSearchResultsPage(c echo.Context) error {
 			return nil
 		}
 
-		Posts(posts, selectedTagsStr, nextPage).Render(w)
+		components.PostSearchResults(posts, selectedTagsStr, nextPage).Render(w)
 	} else {
 		if page == 0 {
 			w.Header().Set("HX-Push-Url", fmt.Sprintf(host+"?tags=%s", selectedTagsStr))
@@ -80,7 +81,7 @@ func PostSearchResultsPage(c echo.Context) error {
 			return nil
 		}
 
-		return Posts(posts, selectedTagsStr, nextPage).Render(c.Response().Writer)
+		return components.PostSearchResults(posts, selectedTagsStr, nextPage).Render(c.Response().Writer)
 	}
 
 	return nil
