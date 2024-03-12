@@ -1,7 +1,7 @@
 import htmx from "htmx.org";
 import Select from "react-select";
 import r2wc from "@r2wc/react-to-web-component";
-import { MenubarDemo } from "./App";
+// import { MenubarDemo } from "./App";
 
 console.log("Initializing React");
 
@@ -70,6 +70,6 @@ const ReactSelectWC = r2wc(ReactSelect, {
 
 customElements.define("react-select", ReactSelectWC);
 
-const AppBarWC = r2wc(MenubarDemo);
+// const AppBarWC = r2wc(MenubarDemo);
 
-customElements.define("app-bar", AppBarWC);
+// customElements.define("app-bar", AppBarWC);

@@ -32,10 +32,10 @@ func Layout(title string, config *models.Config, children g.Node) g.Node {
 				hx.Boost("true"),
 				Navbar(config),
 				h.Div(
-					h.Class("bg-slate-600 h-14 p-2"),
+					h.Class("bg-slate-600 h-2"),
 					h.Div(
 						h.Class("mx-auto max-w-7xl"),
-						g.Raw("<app-bar><div class='h-10 bg-black rounded-md'></div></app-bar>"),
+						// g.Raw("<app-bar><div class='h-10 bg-black rounded-md'></div></app-bar>"),
 					),
 				),
 				h.Div(
