@@ -73,6 +73,7 @@ func main() {
 	e.GET("/posts/details/:id", c.GetPostDetail)
 	e.GET("/partials/posts/search/:page", c.PostSearchResultsPage)
 	e.POST("/partials/posts/search/:page", c.PostSearchResultsPage)
+	e.GET("/login", c.Login)
 
 	PORT := ":8000"
 	if os.Getenv("PORT") != "" {
