@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	_ "embed"
 	"vauntly/models"
 
 	"github.com/labstack/echo/v4"

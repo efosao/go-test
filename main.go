@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "embed"
 	c "vauntly/controllers"
 	mw "vauntly/middleware"
 	"vauntly/models"

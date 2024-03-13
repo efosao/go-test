@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	_ "embed"
 	"vauntly/components"
 	utils "vauntly/utils"
 
