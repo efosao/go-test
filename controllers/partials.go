@@ -16,7 +16,11 @@ func PostSearchResultsPage(c echo.Context) error {
 	pageStr := c.Param("page")
 	page := 0
 	if pageStr != "" {
-		page, _ = strconv.Atoi(pageStr)
+		pgNum, err := strconv.Atoi(pageStr)
+		if err != nil {
+			fmt.Println(err)
+		}
+		page = pgNum
 	}
 	nextPage := page + 1
 	offset := (nextPage - 1) * 10
