@@ -9,6 +9,13 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+// SetupMiddleware sets up the middleware for the given Echo instance.
+// It configures various middleware functions such as Rewrite, Timeout, Gzip, Logger, and Recover.
+// The Rewrite middleware rewrites the URL path based on the specified rules.
+// The Timeout middleware sets a timeout for each request and handles timeout errors.
+// The Gzip middleware compresses the response body using gzip compression.
+// The Logger middleware logs each request with the specified format.
+// The Recover middleware recovers from panics and returns an HTTP 500 error.
 func SetupMiddleware(e *echo.Echo) {
 	e.Pre(middleware.RewriteWithConfig(middleware.RewriteConfig{
 		Rules: map[string]string{
