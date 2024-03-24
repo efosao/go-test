@@ -12,11 +12,15 @@ func Login(config *models.Config) g.Node {
 		"Login",
 		config,
 		h.Div(
-			h.Class("flex flex-col items-center justify-center"),
+			h.Class("flex flex-col items-center justify-center flex-grow h-[calc(100vh-8rem)]"),
 			h.Div(
-				h.Class("w-96"),
+				h.Class("w-96 rounded-md bg-slate-500 p-4"),
 				h.FormEl(
 					h.Class("flex flex-col gap-4"),
+					h.H1(
+						h.Class("text-3xl font-bold text-white"),
+						g.Text("Log in"),
+					),
 					h.Input(
 						h.Type("text"),
 						h.Name("email"),
