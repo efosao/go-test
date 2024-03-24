@@ -31,6 +31,7 @@ func GetConfig(c echo.Context) (*models.Config, error) {
 
 	config := &models.Config{
 		Path:         c.Request().URL.Path,
+		ShowNav:      true,
 		Theme:        theme,
 		ThemeOptions: themeOptions,
 	}

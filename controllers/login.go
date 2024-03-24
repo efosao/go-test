@@ -9,6 +9,7 @@ import (
 
 func Login(c echo.Context) error {
 	config, error := utils.GetConfig(c)
+	config.ShowNav = false
 	if error != nil {
 		return error
 	}

@@ -8,6 +8,7 @@ type ThemeOption struct {
 
 type Config struct {
 	Path         string
+	ShowNav      bool
 	Theme        string
 	ThemeOptions []ThemeOption
 }
