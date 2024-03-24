@@ -25,7 +25,7 @@ func SetupMiddleware(e *echo.Echo) {
 	}))
 	e.Use(middleware.TimeoutWithConfig(middleware.TimeoutConfig{
 		Skipper:      middleware.DefaultSkipper,
-		ErrorMessage: "custom timeout error message returns to client",
+		ErrorMessage: "Server request timed out\n",
 		OnTimeoutRouteErrorHandler: func(err error, c echo.Context) {
 			log.Println(c.Path())
 		},
