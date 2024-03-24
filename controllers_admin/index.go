@@ -12,6 +12,8 @@ import (
 
 	"github.com/labstack/echo/v4"
 	g "github.com/maragudk/gomponents"
+
+	//lint:ignore ST1001 html is a common package name for html templates
 	. "github.com/maragudk/gomponents/html"
 )
 
@@ -41,28 +43,9 @@ func Home(c echo.Context) error {
 			break
 		}
 		if err != nil {
-			// log.Fatalf("error listing users: %s\n", err)
-			return components.Layout("Admin", config,
-				Div(
-					H1(g.Text("Admin")),
-					Div(
-						P(
-							A(
-								g.Attr("href", "/admin"),
-								g.Text("Reload"),
-							),
-						),
-						P(
-							g.Text("Error listing users"),
-						),
-						P(
-							g.Text(err.Error()),
-						),
-					),
-				)).Render(c.Response().Writer)
+			log.Fatalf("error listing users: %s\n", err)
 		}
 		users = append(users, *user)
-		log.Printf("read user user: %v\n", user.Email)
 	}
 
 	return components.Layout("Admin", config,
@@ -74,16 +57,16 @@ func Home(c echo.Context) error {
 				),
 			),
 			Div(
-				Class("grid grid-cols-3 gap-2 bg-black text-white text-sm p-4 rounded-lg"),
+				Class("grid grid-cols-3 gap-2 bg-black text-white text-xs p-4 rounded-lg"),
 				Span(
-					Class("text-red-400"),
+					Class("font-bold text-red-400"),
 					g.Text("Created On")),
 				Span(
-					Class("text-red-400"),
+					Class("font-bold text-red-400"),
 					g.Text("Email")),
 				Span(
 
-					Class("text-red-400"),
+					Class("font-bold text-red-400"),
 					g.Text("Display Name")),
 				g.Group(g.Map(users, func(user auth.ExportedUserRecord) g.Node {
 					return g.Group(
@@ -95,10 +78,18 @@ func Home(c echo.Context) error {
 								return Span(
 									Class("font-semibold"),
 									g.Text(user.Email),
+									Span(
+										Class("text-gray-400"),
+										g.Textf(" (%s)", user.UID),
+									),
 								)
 							}
 							if key == "DisplayName" {
-								return Span(g.Text(user.DisplayName))
+								displayName := g.Raw("&mdash;")
+								if len(user.DisplayName) != 0 {
+									displayName = Span(g.Text(user.DisplayName))
+								}
+								return displayName
 							}
 							return nil
 						}),
