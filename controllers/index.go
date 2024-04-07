@@ -73,7 +73,7 @@ func Home(c echo.Context) error {
 		updatedTags = append(updatedTags, tag)
 	}
 
-	return PostsPage(config, posts, updatedTags, selectedTagsString, 0, "Search the best TECH Jobs today >>").Render(c.Response().Writer)
+	return PostsPage(config, posts, updatedTags, selectedTagsString, 0, "Search the best TECH Jobs today").Render(c.Response().Writer)
 }
 
 func HomePage(config *models.Config) g.Node {

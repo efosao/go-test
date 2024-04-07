@@ -14,7 +14,7 @@ func Navbar(config *models.Config) g.Node {
 		h.Nav(
 			h.Class("bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800"),
 			h.Div(
-				h.Class("flex flex-wrap justify-between items-center mx-auto max-w-screen-xl"),
+				h.Class("flex flex-wrap justify-between items-center mx-auto max-w-5xl"),
 				h.A(
 					h.Href("/"),
 					h.Class("flex items-center"),
@@ -25,7 +25,7 @@ func Navbar(config *models.Config) g.Node {
 					),
 					h.Span(
 						h.Class("self-center text-xl font-semibold whitespace-nowrap dark:text-white"),
-						g.Text("Vauntly"),
+						g.Text("WorksOnCode"),
 					),
 				),
 				h.Div(
@@ -95,6 +95,8 @@ func NavLink(href, name, currentPath string, classes string) g.Node {
 	return h.Li(
 		h.A(
 			h.Href(href),
+			g.Attr("up-follow"),
+			g.Attr("up-transition", "cross-fade"),
 			c.Classes{
 				"block p-2 border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700": true,
 				"text-gray-500 dark:text-gray-400": currentPath != href,

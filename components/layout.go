@@ -34,17 +34,17 @@ func Layout(title string, config *models.Config, children g.Node) g.Node {
 				h.Div(
 					h.Class("bg-orange-300 transition-colors dark:bg-slate-600 h-2"),
 					h.Div(
-						h.Class("mx-auto max-w-7xl"),
+						h.Class("mx-auto max-w-5xl"),
 						// g.Raw("<app-bar><div class='h-10 bg-black rounded-md'></div></app-bar>"),
 					),
 				),
 				h.Div(
-					h.Class("flex-grow w-full p-2 mx-auto max-w-7xl"),
+					h.Class("flex-grow w-full p-2 mx-auto max-w-5xl"),
 					h.ID("page-content"),
 					g.If(config.ShowNav,
 						h.H1(
 							h.ID("page-title"),
-							h.Class("my-4 overflow-hidden max-w-7xl text-3xl font-extrabold text-black dark:text-black"),
+							h.Class("my-4 overflow-hidden max-w-5xl text-3xl font-extrabold text-black dark:text-black"),
 							g.Text(title),
 						)),
 					children,

@@ -11,7 +11,7 @@ import (
 func ResultsRow(post models.Post) g.Node {
 	class := "search_row w-full group relative mb-2 rounded-md border-0 border-pink-200 bg-pink-100 dark:border-prussian-blue-900 dark:bg-slate-700 dark:text-white"
 	if post.IsPinned() {
-		class = "search_row group relative mb-2 rounded-md border-0 border-orange-200 bg-orange-200 text-black dark:border-slate-700 dark:bg-pink-700 dark:text-white"
+		class = "search_row group relative mb-2 rounded-md border-0 border-orange-200 bg-orange-200 text-black dark:border-slate-700 dark:bg-sky-600 dark:text-white"
 	}
 
 	return h.Div(
