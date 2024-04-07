@@ -20,7 +20,7 @@ func Navbar(config *models.Config) g.Node {
 					h.Class("flex items-center"),
 					h.Img(
 						h.Src("/public/test-logo.svg"),
-						h.Class("mr-3 h-6 sm:h-9"),
+						h.Class("bg-white mr-3 h-6 sm:h-9"),
 						h.Alt("Flowbite Logo"),
 					),
 					h.Span(
