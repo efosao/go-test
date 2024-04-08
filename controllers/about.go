@@ -81,6 +81,40 @@ func AboutPage(config *models.Config) g.Node {
 					h.Class("mt-4 border rounded-md p-4"),
 				),
 			),
+			h.Div(
+				h.Class("flex flex-col gap-2"),
+				g.Attr("x-data", "{ open: false }"),
+				h.Label(
+					h.Class("text-gray-700 text-xl font-extrabold"),
+					h.DataAttr("text", "$foo"),
+				),
+				h.Button(
+					h.Class("button"),
+					g.Attr("@click", "open = !open"),
+					g.Text("Toggle block w/h Alpine"),
+				),
+				h.Div(
+					h.Class("bg-pink-200 input p-8 border border-gray-300 dark:bg-pink-600 rounded-md"),
+					g.Attr("x-show", "open"),
+					g.Attr("x-transition"),
+					g.Attr("x-bind:class", "open ? 'block' : 'hidden'"),
+					h.P(
+						g.Text("This is a paragraph"),
+					),
+					h.P(
+						g.Text("This is a paragraph"),
+					),
+					h.P(
+						g.Text("This is a paragraph"),
+					),
+					h.P(
+						g.Text("This is a paragraph"),
+					),
+					h.P(
+						g.Text("This is a paragraph"),
+					),
+				),
+			),
 			h.Button(
 				c.Classes{"button": true},
 				h.ID("dialog_button"),

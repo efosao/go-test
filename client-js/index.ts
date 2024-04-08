@@ -3,16 +3,25 @@
 import htmx from "htmx.org";
 import Cookies from "js-cookie";
 // import "./preact";
+// import "@sudodevnull/datastar";
+// import "unpoly";
+import Alpine from "alpinejs";
 import "./react";
 
 declare global {
   interface Window {
     __htmx: any;
+    alpine: any;
+    fn: any;
     utils: any;
   }
 }
 
 window.__htmx = htmx;
+window.alpine = Alpine;
+window.fn = (...args: any) => {
+  console.log("fn", args);
+};
 
 const ENABLE_HTMX_DEBUG = process.env.NODE_ENV !== "production" && false;
 
@@ -162,6 +171,7 @@ function animatePageTitle() {
 
 window.document.addEventListener("DOMContentLoaded", () => {
   console.debug("DOMContentLoaded");
+  Alpine.start();
   animatePageTitle();
   utils.init();
   loadEventListeners();
