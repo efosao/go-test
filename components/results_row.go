@@ -18,7 +18,7 @@ func ResultsRow(post models.Post) g.Node {
 		h.Class(class),
 		g.Attr("onclick", "utils.toggleOpenState('cbx"+post.ID+"', 'desc"+post.ID+"')"),
 		h.Div(
-			c.Classes{"cursor-pointer flex h-32 items-center space-x-2 px-2": true},
+			c.Classes{"cursor-pointer flex h-32 items-center space-x-4 px-4": true},
 			g.If(post.Thumbnail != "", h.Span(
 				c.Classes{"rounded-full initials inline-flex h-[40px] w-[40px] my-2 shrink-0 items-center justify-center overflow-hidden": true},
 				h.Img(h.Src(post.Thumbnail), h.Width("40"), h.Height("40")),
@@ -57,13 +57,13 @@ func ResultsRow(post models.Post) g.Node {
 				),
 			),
 			h.Span(
-				c.Classes{"m-2": true},
+				h.Class("m-2"),
 				g.Text(post.TimeSinceCreated()),
 			),
 			h.Span(
 				g.Attr("onclick", "utils.halt(event)"),
 				h.Button(
-					c.Classes{"btn-apply done": true},
+					h.Class("btn-apply done"),
 					g.Text("Applied"),
 				),
 			),
