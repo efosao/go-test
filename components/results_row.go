@@ -9,9 +9,9 @@ import (
 )
 
 func ResultsRow(post models.Post) g.Node {
-	class := "search_row w-full group relative mb-2 rounded-md border-0 border-pink-200 bg-pink-100 dark:border-prussian-blue-900 dark:bg-slate-700 dark:text-white"
+	class := "search_row w-full group relative mb-2 rounded-sm border-0 border-pink-200 bg-pink-100 dark:border-prussian-blue-900 dark:bg-slate-700 dark:text-white"
 	if post.IsPinned() {
-		class = "search_row group relative mb-2 rounded-md border-0 border-orange-200 bg-orange-200 text-black dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+		class = "search_row group relative mb-2 rounded-sm border-0 border-orange-200 bg-orange-200 text-black dark:border-slate-700 dark:bg-slate-900 dark:text-white"
 	}
 
 	return h.Div(
@@ -50,7 +50,7 @@ func ResultsRow(post models.Post) g.Node {
 					g.Group(g.Map(post.Tags, func(tag string) g.Node {
 						return h.Button(
 							g.Attr("onclick", "utils.halt(event)"),
-							c.Classes{"inline cursor-pointer rounded-md bg-white px-2 mr-1 font-semibold text-pink-950 transition-colors duration-300 hover:bg-blue-100 hover:text-black my-[2px]": true},
+							h.Class("hidden cursor-pointer rounded-md bg-white px-2 mr-1 font-semibold text-pink-950 transition-colors duration-300 hover:bg-blue-100 hover:text-black my-[2px]"),
 							g.Text(tag),
 						)
 					})),
@@ -64,7 +64,7 @@ func ResultsRow(post models.Post) g.Node {
 				g.Attr("onclick", "utils.halt(event)"),
 				h.Button(
 					h.Class("btn-apply done"),
-					g.Text("Applied"),
+					g.Text("Apply"),
 				),
 			),
 		),

@@ -320,7 +320,7 @@ div.tag-select__loading-indicator {
 }
 
 .btn-apply {
-  @apply rounded-md bg-slate-900 px-4 py-1 font-semibold text-white dark:bg-slate-400 dark:text-slate-950 transition-all hover:bg-opacity-50;
+  @apply rounded bg-slate-900 px-4 py-1 font-semibold text-white dark:bg-slate-400 dark:text-slate-950 transition-all hover:bg-opacity-50;
 }
 
 .btn-apply.done {
