@@ -44,7 +44,7 @@ func Layout(title string, config *models.Config, children g.Node) g.Node {
 					g.If(config.ShowNav,
 						h.H1(
 							h.ID("page-title"),
-							h.Class("my-4 max-w-5xl text-3xl font-extrabold text-black dark:text-black"),
+							h.Class("my-4 max-w-5xl text-3xl font-bold text-black dark:text-black"),
 							g.Text(title),
 						)),
 					children,
