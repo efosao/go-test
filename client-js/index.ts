@@ -52,12 +52,13 @@ const utils = {
     return isDark;
   },
 
-  configureDefaultTheme: () => {
+  configureDefaultTheme: (animate = true) => {
     const darkToggleId = "dark-mode-toggle";
     const lightToggleId = "light-mode-toggle";
 
     const darkToggle = document.getElementById(darkToggleId);
     const lightToggle = document.getElementById(lightToggleId);
+    const duration = animate ? 300 : 0;
 
     function transitionToggles(
       outElement: HTMLElement,
@@ -68,7 +69,7 @@ const utils = {
           { opacity: 1, transform: "rotate(0deg)" },
           { opacity: 0, transform: "rotate(360deg)" },
         ],
-        { duration: 300, fill: "forwards", easing: "ease-in-out" }
+        { duration, fill: "forwards", easing: "ease-in-out" }
       );
       inElement.classList.remove("hidden");
       inElement.animate(
@@ -77,7 +78,7 @@ const utils = {
           { opacity: 1, transform: "rotate(360deg)" },
         ],
         {
-          duration: 300,
+          duration,
           fill: "forwards",
         }
       );
@@ -179,7 +180,10 @@ window.document.addEventListener("DOMContentLoaded", () => {
 
 htmx.onLoad(function (e) {
   console.debug("htmx.onLoad");
-  if (e.id === "page-content") animatePageTitle();
+  if (e.id === "page-content") {
+    animatePageTitle();
+    utils.configureDefaultTheme(false);
+  }
   loadEventListeners();
 });
 
