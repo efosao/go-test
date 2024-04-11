@@ -147,11 +147,10 @@ input[type="file"],
 input[type="range"],
 input[type="submit"],
 input[type="reset"],
-input[type="button"],
+/* input[type="button"], */
 input[type="radio"],
 input[type="checkbox"],
 select,
-button,
 textarea {
   @apply rounded dark:border-slate-700 dark:bg-slate-800 dark:text-gray-200 dark:placeholder-gray-500 dark:hover:border-slate-400 dark:hover:bg-slate-400 dark:hover:text-gray-200 dark:hover:placeholder-gray-500 dark:focus:border-gray-700 dark:focus:ring-0 dark:focus:ring-gray-700 dark:focus:ring-opacity-50 dark:hover:focus:border-gray-700 dark:hover:focus:ring-0 dark:hover:focus:ring-gray-700 dark:hover:focus:ring-opacity-50;
   border-radius: 0.25rem;
