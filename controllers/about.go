@@ -145,9 +145,10 @@ func getAlpineTest() g.Node {
 			h.DataAttr("text", "$foo"),
 		),
 		h.Button(
-			h.Class("button"),
+			h.Class("text-white p-2 rounded-md transition-colors"),
 			g.Attr("@click", "open = !open"),
 			g.Text("Toggle block w/h Alpine"),
+			g.Attr("x-bind:class", "open ? 'bg-red-500' : 'bg-black'"),
 		),
 		h.Div(
 			h.Class("bg-pink-200 input p-8 border border-gray-300 dark:bg-pink-600 rounded-md"),
@@ -155,19 +156,12 @@ func getAlpineTest() g.Node {
 			g.Attr("x-transition"),
 			g.Attr("x-bind:class", "open ? 'block' : 'hidden'"),
 			h.P(
-				g.Text("This is a paragraph"),
+				h.Class("text-black"),
+				g.Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi porta eu ligula eu sagittis. Donec porta turpis eget euismod congue. Integer nisi arcu, mattis vitae elit quis, dapibus eleifend nulla. Suspendisse posuere ultrices dictum. Morbi in quam interdum, maximus justo at, sollicitudin odio. Etiam ut tempor leo, eu ultricies ipsum. Sed metus lacus, pharetra in ultricies ac, mollis non nisl. Quisque tempus urna et massa facilisis dapibus nec non ex. Nam felis orci, varius quis pulvinar sit amet, placerat et dolor. Duis sed lectus pulvinar, placerat est sit amet, scelerisque tellus. Sed fringilla consectetur dui congue pulvinar. Mauris tempus pharetra enim eu congue. Cras ipsum magna, porta a tellus a, malesuada eleifend neque. Maecenas dictum felis eleifend dignissim tristique. Aliquam rhoncus ultrices est, eu mattis ligula."),
 			),
 			h.P(
-				g.Text("This is a paragraph"),
-			),
-			h.P(
-				g.Text("This is a paragraph"),
-			),
-			h.P(
-				g.Text("This is a paragraph"),
-			),
-			h.P(
-				g.Text("This is a paragraph"),
+				h.Class("text-black"),
+				g.Text("Sed et fringilla diam. Vivamus hendrerit sodales nunc et dictum. Nulla laoreet consequat tellus, elementum ultricies tellus dignissim ac. Donec dui lectus, vehicula eget porttitor eu, volutpat id augue. Nullam odio ipsum, placerat a felis quis, hendrerit dictum orci. Donec egestas justo vel magna semper lobortis. In dictum blandit metus quis dignissim. Cras tristique gravida ipsum sed lacinia."),
 			),
 		),
 	)
