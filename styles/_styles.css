@@ -270,14 +270,11 @@ div.tag-select__loading-indicator {
 .search_row article,
 .editor .content {
   a {
-    color: gray;
-    border-bottom: 4px solid #fee;
+    @apply p-2 duration-150 no-underline text-blue-600 rounded;
     overflow-wrap: anywhere;
-    padding: 2px 2px;
     transition: all 0.3s;
     &:hover {
-      background: #fee;
-      border-bottom: 4px solid #fcc;
+      @apply bg-slate-700 text-blue-400;
     }
   }
 
