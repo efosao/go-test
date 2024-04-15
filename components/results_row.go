@@ -16,8 +16,8 @@ func ResultsRow(post models.Post) g.Node {
 
 	return h.Div(
 		h.Class(class),
-		g.Attr("onclick", "utils.toggleOpenState('cbx"+post.ID+"', 'desc"+post.ID+"')"),
 		h.Div(
+			g.Attr("onclick", "utils.toggleOpenState('cbx"+post.ID+"', 'desc"+post.ID+"')"),
 			c.Classes{"cursor-pointer flex h-32 items-center space-x-4 px-4": true},
 			g.If(post.Thumbnail != "", h.Span(
 				c.Classes{"rounded-full initials inline-flex h-[40px] w-[40px] my-2 shrink-0 items-center justify-center overflow-hidden": true},
