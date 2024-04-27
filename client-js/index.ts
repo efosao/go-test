@@ -26,7 +26,7 @@ window.fn = (...args: any) => {
 const ENABLE_HTMX_DEBUG = process.env.NODE_ENV !== "production" && false;
 
 const selectors = {
-  pgTitle: "page-title"
+  pgTitle: "page-title",
 };
 
 const utils = {
@@ -67,7 +67,7 @@ const utils = {
       outElement.animate(
         [
           { opacity: 1, transform: "rotate(0deg)" },
-          { opacity: 0, transform: "rotate(360deg)" }
+          { opacity: 0, transform: "rotate(360deg)" },
         ],
         { duration, fill: "forwards", easing: "ease-in-out" }
       );
@@ -75,11 +75,11 @@ const utils = {
       inElement.animate(
         [
           { opacity: 0, transform: "rotate(0deg)" },
-          { opacity: 1, transform: "rotate(360deg)" }
+          { opacity: 1, transform: "rotate(360deg)" },
         ],
         {
           duration,
-          fill: "forwards"
+          fill: "forwards",
         }
       );
     }
@@ -120,7 +120,7 @@ const utils = {
     if (!options.includes(theme)) throw new Error("Unknown theme: " + theme);
     Cookies.set("theme", theme);
     utils.configureDefaultTheme();
-  }
+  },
 };
 
 window
