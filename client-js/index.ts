@@ -4,9 +4,10 @@ import htmx from "htmx.org";
 import Cookies from "js-cookie";
 // import "./preact";
 // import "@sudodevnull/datastar";
-// import "unpoly";
+import "unpoly";
 import Alpine from "alpinejs";
 import "./react";
+import "./components";
 
 declare global {
   interface Window {
