@@ -50,6 +50,7 @@
     "react-select": "^5.8.0",
     "react-to-webcomponent": "^2.0.0",
     "tailwind-merge": "^2.2.1",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "unpoly": "^3.7.3"
   }
 }
