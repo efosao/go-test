@@ -12,7 +12,7 @@ func Navbar(config *models.Config) g.Node {
 	currentPath := config.Path
 	return h.Div(
 		h.Nav(
-			h.Class("bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800"),
+			h.Class("bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800 z-10"),
 			h.Div(
 				h.Class("flex flex-wrap justify-between items-center mx-auto max-w-5xl"),
 				h.A(
@@ -85,6 +85,15 @@ func Navbar(config *models.Config) g.Node {
 					),
 					h.A(
 						h.Href("/login"),
+						g.Attr("up-layer", "new"),
+						g.Attr("up-target", ".form"),
+						g.Attr("up-mode", "popup"),
+						g.Attr("up-position", "bottom"),
+						g.Attr("up-align", "right"),
+						g.Attr("up-size", "large"),
+						g.Attr("Up-history", "false"),
+						// g.Attr("up-animation", "move-from-top"),
+
 						h.Class("text-gray-800 dark:text-white hover:bg-gray-50 focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 dark:hover:bg-gray-700 focus:outline-none dark:focus:ring-gray-800"),
 						g.Text("Log in"),
 					),
@@ -99,7 +108,9 @@ func NavLink(href, name, currentPath string, classes string) g.Node {
 		h.A(
 			h.Href(href),
 			g.Attr("up-follow"),
-			g.Attr("up-transition", "cross-fade"),
+			g.Attr("up-instant"),
+			g.Attr("up-target", "nav, main"),
+			g.Attr("up-transition", "move-up"),
 			c.Classes{
 				"block p-2 border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 lg:hover:text-primary-700 lg:p-0 lg:dark:hover:text-white dark:hover:bg-gray-700 dark:hover:text-white lg:dark:hover:bg-transparent dark:border-gray-700": true,
 				"text-gray-500 dark:text-gray-400": currentPath != href,

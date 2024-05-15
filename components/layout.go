@@ -29,7 +29,7 @@ func Layout(title string, config *models.Config, children g.Node) g.Node {
 			),
 			h.Body(
 				h.Class("flex flex-col min-h-screen dark:bg-slate-400"),
-				hx.Boost("true"),
+				hx.Boost("false"),
 				g.If(config.ShowNav, Navbar(config)),
 				h.Div(
 					h.Class("bg-orange-300 transition-colors dark:bg-slate-600 h-2"),
@@ -38,9 +38,10 @@ func Layout(title string, config *models.Config, children g.Node) g.Node {
 						// g.Raw("<app-bar><div class='h-10 bg-black rounded-md'></div></app-bar>"),
 					),
 				),
-				h.Div(
+				h.Main(
 					h.Class("flex-grow w-full p-2 mx-auto max-w-5xl"),
 					h.ID("page-content"),
+					g.Attr("up-main"),
 					g.If(config.ShowNav,
 						h.H1(
 							h.ID("page-title"),

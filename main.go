@@ -72,6 +72,7 @@ func main() {
 	e.GET("/partials/posts/search/:page", c.PostSearchResultsPage)
 	e.POST("/partials/posts/search/:page", c.PostSearchResultsPage)
 	e.GET("/login", c.Login)
+	e.POST("/login", c.LoginPost)
 	e.GET("/admin", ca.Home)
 
 	PORT := ":8000"

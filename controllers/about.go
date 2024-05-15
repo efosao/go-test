@@ -85,10 +85,6 @@ func AboutPage(config *models.Config) g.Node {
 			getAlpineTest(),
 			getAlpineTest(),
 			getAlpineTest(),
-			getAlpineTest(),
-			getAlpineTest(),
-			getAlpineTest(),
-			getAlpineTest(),
 			h.Button(
 				c.Classes{"button": true},
 				h.ID("dialog_button"),
@@ -138,23 +134,24 @@ func AboutPage(config *models.Config) g.Node {
 
 func getAlpineTest() g.Node {
 	return h.Div(
-		h.Class("flex flex-col gap-2"),
-		g.Attr("x-data", "{ open: false }"),
+		h.Class("flex flex-col gap-2 comp__alpine_test"),
+		// g.Attr("x-data", "{ open: false }"),
+		g.Attr("up-data", "{ \"open\": false }"),
 		h.Label(
 			h.Class("text-gray-700 text-xl font-extrabold"),
 			h.DataAttr("text", "$foo"),
 		),
 		h.Button(
-			h.Class("text-white p-2 rounded-md transition-colors"),
+			h.Class("text-white p-2 rounded-md transition-colors bg-red-500"),
 			g.Attr("@click", "open = !open"),
 			g.Text("Toggle block w/h Alpine"),
-			g.Attr("x-bind:class", "open ? 'bg-red-500' : 'bg-black'"),
+			// g.Attr("x-bind:class", "open ? 'bg-red-500' : 'bg-black'"),
 		),
 		h.Div(
-			h.Class("bg-pink-200 input p-8 border border-gray-300 dark:bg-pink-600 rounded-md"),
-			g.Attr("x-show", "open"),
-			g.Attr("x-transition"),
-			g.Attr("x-bind:class", "open ? 'block' : 'hidden'"),
+			h.Class("bg-pink-200 input p-8 border border-gray-300 dark:bg-pink-600 rounded-md comp__view hidden"),
+			// g.Attr("x-show", "open"),
+			// g.Attr("x-transition"),
+			// g.Attr("x-bind:class", "open ? 'block' : 'hidden'"),
 			h.P(
 				h.Class("text-black"),
 				g.Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi porta eu ligula eu sagittis. Donec porta turpis eget euismod congue. Integer nisi arcu, mattis vitae elit quis, dapibus eleifend nulla. Suspendisse posuere ultrices dictum. Morbi in quam interdum, maximus justo at, sollicitudin odio. Etiam ut tempor leo, eu ultricies ipsum. Sed metus lacus, pharetra in ultricies ac, mollis non nisl. Quisque tempus urna et massa facilisis dapibus nec non ex. Nam felis orci, varius quis pulvinar sit amet, placerat et dolor. Duis sed lectus pulvinar, placerat est sit amet, scelerisque tellus. Sed fringilla consectetur dui congue pulvinar. Mauris tempus pharetra enim eu congue. Cras ipsum magna, porta a tellus a, malesuada eleifend neque. Maecenas dictum felis eleifend dignissim tristique. Aliquam rhoncus ultrices est, eu mattis ligula."),
